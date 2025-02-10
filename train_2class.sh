@@ -45,7 +45,7 @@ echo "Starting the training process..."
 # microsoft/infoxlm-large
 # vinai/phobert-large
 
-BS=48
+BS=24
 models_classify=("FacebookAI/xlm-roberta-large" "MoritzLaurer/ernie-m-large-mnli-xnli" "microsoft/infoxlm-large" "vinai/phobert-large")
 loss_types=("focal_loss")
 
@@ -55,7 +55,7 @@ do
 
     echo "Starting training for model: $model_name"
  
-    python3 src/training/classify.py \
+    CUDA_VISIBLE_DEVICES=1 python3 src/training/classify.py \
         --train_data "./data/classify/isedsc_train.csv" \
         --dev_data "./data/classify/isedsc_test.csv" \
         --model_name "$model" \
@@ -76,21 +76,21 @@ done
 
 echo "Starting training for model: $model_name"
  
-    python3 src/training/classify.py \
-        --train_data "./data/classify/viwiki_train.csv" \
-        --dev_data "./data/classify/viwiki_test.csv" \
-        --model_name "FacebookAI/xlm-roberta-large" \
-        --lr 1e-5 \
-        --epochs 20 \
-        --accumulation_steps 1 \
-        --batch_size $BS \
-        --max_len 256 \
-        --num_workers 2 \
-        --patience 3 \
-        --type_loss "focal_loss" \
-        --output_dir "./xlm-roberta-large_viwiki_2class_focal" \
-        --n_classes 2\
-        --is_weighted 1
+CUDA_VISIBLE_DEVICES=1 python3 src/training/classify.py \
+    --train_data "./data/classify/viwiki_train.csv" \
+    --dev_data "./data/classify/viwiki_test.csv" \
+    --model_name "FacebookAI/xlm-roberta-large" \
+    --lr 1e-5 \
+    --epochs 20 \
+    --accumulation_steps 1 \
+    --batch_size $BS \
+    --max_len 256 \
+    --num_workers 2 \
+    --patience 3 \
+    --type_loss "focal_loss" \
+    --output_dir "./xlm-roberta-large_viwiki_2class_focal" \
+    --n_classes 2\
+    --is_weighted 1
 
-    echo "Training completed for model: $model_name"
+echo "Training completed for model: $model_name"
 
