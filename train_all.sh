@@ -84,7 +84,7 @@ do
             --train_data "./data/classify/viwiki_train.csv" \
             --dev_data "./data/classify/viwiki_test.csv" \
             --model_name "./$model" \
-            --lr     \
+            --lr 1e-5\
             --epochs 20 \
             --accumulation_steps 1 \
             --batch_size 64 \

@@ -66,11 +66,31 @@ do
         --max_len 256 \
         --num_workers 2 \
         --patience 3 \
-        --type_loss "cross_entropy" \
-        --output_dir "./${model_name}_isedsc_3class_cross" \
-        --n_classes 3\
+        --type_loss "focal_loss" \
+        --output_dir "./${model_name}_isedsc_2class_focal" \
+        --n_classes 2\
         --is_weighted 1
 
     echo "Training completed for model: $model_name"
 done
+
+echo "Starting training for model: $model_name"
+ 
+    python3 src/training/classify.py \
+        --train_data "./data/classify/viwiki_train.csv" \
+        --dev_data "./data/classify/viwiki_test.csv" \
+        --model_name "FacebookAI/xlm-roberta-large" \
+        --lr 1e-5 \
+        --epochs 20 \
+        --accumulation_steps 1 \
+        --batch_size $BS \
+        --max_len 256 \
+        --num_workers 2 \
+        --patience 3 \
+        --type_loss "focal_loss" \
+        --output_dir "./xlm-roberta-large_viwiki_2class_focal" \
+        --n_classes 2\
+        --is_weighted 1
+
+    echo "Training completed for model: $model_name"
 

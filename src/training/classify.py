@@ -199,7 +199,7 @@ def main(args):
 
         if dev_f1 > best_acc:
             cnt = 0
-            torch.save(model, os.path.join(output_dir, 'full_model.pth'))
+            # torch.save(model, os.path.join(output_dir, 'full_model.pth'))
             torch.save(model.state_dict(), os.path.join(output_dir, 'best_acc.pth'))
             print(f'save best_acc.pth with epoch {epoch+1}')
             best_acc = dev_f1
@@ -217,7 +217,6 @@ def main(args):
     print('Finish training')
     print(f'Total time: {time.time() - total_time:.2f}s')
 
-    # Save info_epoch
     info_epoch = pd.DataFrame(info_epoch).T
     info_epoch.to_csv(os.path.join(output_dir, 'info_epoch.csv'), index=False)
     
