@@ -18,7 +18,7 @@ python3 download_model.py
 ## Cài đặt các thư viện cần thiết
 ```bash
 pip install transformers==4.42.3
-pip install torch==2.1.2 torchvision==0.16.2 torchaudio==2.1.2 --index-url https://download.pytorch.org/whl/cu118
+pip install torch==2.3.0 torchvision==0.18.0 torchaudio==2.3.0 --index-url https://download.pytorch.org/whl/cu118
 pip install -r requirements.txt
 ```
 
