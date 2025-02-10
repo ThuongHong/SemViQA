@@ -212,6 +212,8 @@ def main(args):
             print('Stop model') 
             break
 
+        torch.cuda.empty_cache()
+
     print('Finish training')
     print(f'Total time: {time.time() - total_time:.2f}s')
 

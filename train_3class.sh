@@ -43,7 +43,7 @@ echo "Starting the training process..."
 # microsoft/infoxlm-large
 # vinai/phobert-large
 
-BS=88
+BS=48
 models_classify=("FacebookAI/xlm-roberta-large" "MoritzLaurer/ernie-m-large-mnli-xnli" "microsoft/infoxlm-large" "vinai/phobert-large")
 loss_types=("focal_loss")
 
@@ -56,7 +56,7 @@ do
     python3 src/training/classify.py \
         --train_data "./data/classify/isedsc_train.csv" \
         --dev_data "./data/classify/isedsc_test.csv" \
-        --model_name "./$model" \
+        --model_name "$model" \
         --lr 1e-5 \
         --epochs 20 \
         --accumulation_steps 1 \
