@@ -84,6 +84,7 @@ def main(args):
     
     # info_epoch = pd.DataFrame(columns=["time_train", "epoch", "train_loss", "train_acc",  "f1-train", "time_val", "val_acc","val_loss", "f1-val"])
     info_epoch = {}
+    logs = []
 
     best_acc = 0
     cnt = 0
@@ -131,7 +132,9 @@ def main(args):
         train_f1 = f1_score(true_labels, predicted_labels, average='macro')
         train_acc = accuracy_score(true_labels, predicted_labels)
         epoch_training_time = time.time() - start_training_time
-        print(f'Training time: {epoch_training_time:.2f}s Train Loss: {np.mean(train_losses):.4f} F1: {train_f1:.4f} Acc: {train_acc:.4f}')
+        info_train = f'Training time: {epoch_training_time:.2f}s Train Loss: {np.mean(train_losses):.4f} F1: {train_f1:.4f} Acc: {train_acc:.4f}'
+        print(info_train)
+        logs.append(info_train)
 
         # Evaluation
         model.eval()
@@ -176,9 +179,15 @@ def main(args):
             dev_roc_auc = "N/A"
         epoch_eval_time = time.time() - start_eval_time
 
+        clss_report = classification_report(y_true_list, y_pred_list, digits=4)
+        info_eval = f'Dev time: {epoch_eval_time}s Dev Loss: {np.mean(eval_losses):.4f} F1: {dev_f1:.4f} Acc: {dev_acc:.4f} Precision: {dev_precision:.4f} Recall: {dev_recall:.4f} Cohen Kappa: {dev_cohen_kappa:.4f} Matthews Corrcoef: {dev_matthews_corrcoef:.4f} ROC AUC: {dev_roc_auc}'
         print(dev_confusion_matrix)
-        print(classification_report(y_true_list, y_pred_list, digits=4))
-        print(f'Dev time: {epoch_eval_time}s Dev Loss: {np.mean(eval_losses):.4f} F1: {dev_f1:.4f} Acc: {dev_acc:.4f} Precision: {dev_precision:.4f} Recall: {dev_recall:.4f} Cohen Kappa: {dev_cohen_kappa:.4f} Matthews Corrcoef: {dev_matthews_corrcoef:.4f} ROC AUC: {dev_roc_auc}')
+        print(info_eval)
+        print(clss_report)
+        logs.append(info_eval)
+        logs.append(str(clss_report))
+        logs.append(str(dev_confusion_matrix))
+
 
         info_epoch[epoch] = {
             "time_train": epoch_training_time,
@@ -196,6 +205,12 @@ def main(args):
             "matthews_corrcoef": dev_matthews_corrcoef,
             "roc_auc": dev_roc_auc
         }
+        # Save logs
+        with open(os.path.join(output_dir, 'logs.txt'), 'a') as f:
+            f.write(f'Epoch {epoch+1}/{args.epochs}\n')
+            for log in logs:
+                f.write(f'{log}\n')
+            f.write('\n')
 
         if dev_f1 > best_acc:
             cnt = 0

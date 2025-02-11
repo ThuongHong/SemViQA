@@ -45,32 +45,63 @@ echo "Starting the training process..."
 # microsoft/infoxlm-large
 # vinai/phobert-large
 
-BS=48
-models_classify=("FacebookAI/xlm-roberta-large" "microsoft/infoxlm-large")
+BS=54
+models_classify=("FacebookAI/xlm-roberta-large" "microsoft/infoxlm-large" "vinai/phobert-large" "MoritzLaurer/ernie-m-large-mnli-xnli")
 loss_types=("focal_loss")
 
 for model in "${models_classify[@]}"
 do 
-    model_name=$(basename "$model")
+    model_name=$(basename "$model") 
+    if [ "$model" == "MoritzLaurer/ernie-m-large-mnli-xnli" ]; then
+        echo "Skipping model: $model_name"
+        continue
+    fi
 
     echo "Starting training for model: $model_name"
  
-    CUDA_VISIBLE_DEVICES=1 python3 src/training/classify.py \
+    CUDA_VISIBLE_DEVICES=0 python3 src/training/classify.py \
         --train_data "./data/classify/isedsc_train.csv" \
         --dev_data "./data/classify/isedsc_test.csv" \
         --model_name "$model" \
         --lr 1e-5 \
-        --epochs 20 \
+        --epochs 15 \
         --accumulation_steps 1 \
         --batch_size $BS \
         --max_len 256 \
         --num_workers 2 \
         --patience 3 \
         --type_loss "cross_entropy" \
-        --output_dir "./${model_name}_isedsc_3class_cross1" \
+        --output_dir "./${model_name}_isedsc_3class_cross" \
         --n_classes 3\
         --is_weighted 0
 
     echo "Training completed for model: $model_name"
 done
+
+# viwiki
+
+# for model in "${models_classify[@]}"
+# do 
+#     model_name=$(basename "$model")
+
+#     echo "Starting training for model: $model_name"
+ 
+#     CUDA_VISIBLE_DEVICES=1 python3 src/training/classify.py \
+#         --train_data "./data/classify/viwiki_train.csv" \
+#         --dev_data "./data/classify/viwiki_test.csv" \
+#         --model_name "$model" \
+#         --lr 1e-5 \
+#         --epochs 15 \
+#         --accumulation_steps 1 \
+#         --batch_size $BS \
+#         --max_len 256 \
+#         --num_workers 2 \
+#         --patience 3 \
+#         --type_loss "cross_entropy" \
+#         --output_dir "./${model_name}_viwiki_3class_cross" \
+#         --n_classes 3\
+#         --is_weighted 0
+
+#     echo "Training completed for model: $model_name"
+# done
 
