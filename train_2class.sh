@@ -65,7 +65,7 @@ do
         --batch_size $BS \
         --max_len 256 \
         --num_workers 2 \
-        --patience 3 \
+        --patience 5 \
         --type_loss "focal_loss" \
         --output_dir "./${model_name}_isedsc_2class_focal" \
         --n_classes 2\
@@ -86,7 +86,7 @@ CUDA_VISIBLE_DEVICES=1 python3 src/training/classify.py \
     --batch_size $BS \
     --max_len 256 \
     --num_workers 2 \
-    --patience 3 \
+    --patience 5 \
     --type_loss "focal_loss" \
     --output_dir "./xlm-roberta-large_viwiki_2class_focal" \
     --n_classes 2\

@@ -46,7 +46,7 @@ echo "Starting the training process..."
 # vinai/phobert-large
 
 BS=48
-models_classify=("FacebookAI/xlm-roberta-large" "MoritzLaurer/ernie-m-large-mnli-xnli" "microsoft/infoxlm-large" "vinai/phobert-large")
+models_classify=("FacebookAI/xlm-roberta-large" "microsoft/infoxlm-large")
 loss_types=("focal_loss")
 
 for model in "${models_classify[@]}"
@@ -55,7 +55,7 @@ do
 
     echo "Starting training for model: $model_name"
  
-    python3 src/training/classify.py \
+    CUDA_VISIBLE_DEVICES=1 python3 src/training/classify.py \
         --train_data "./data/classify/isedsc_train.csv" \
         --dev_data "./data/classify/isedsc_test.csv" \
         --model_name "$model" \
@@ -67,9 +67,9 @@ do
         --num_workers 2 \
         --patience 3 \
         --type_loss "cross_entropy" \
-        --output_dir "./${model_name}_isedsc_3class_cross" \
+        --output_dir "./${model_name}_isedsc_3class_cross1" \
         --n_classes 3\
-        --is_weighted 1
+        --is_weighted 0
 
     echo "Training completed for model: $model_name"
 done
