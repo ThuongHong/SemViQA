@@ -1,6 +1,7 @@
 
 import torch
 from torch.utils.data import Dataset
+import re
 
 class Data(Dataset):
     def __init__(self, df, tokenizer, config, max_len=400):
@@ -46,10 +47,16 @@ class Data(Dataset):
             2: {'SUPPORTED': 0, 'REFUTED': 1} 
         }
         return label_map[self.config.n_classes].get(text, 1)
+    
+    def preprocess_text(self, text):    
+        text = re.sub(r"['\",\.\?:\!]", "", text)
+        text = text.strip()
+        text = " ".join(text.split())
+        return text
 
     def get_input_data(self, row):
-        claim = row['claim']
-        context = row['evidence']
+        claim = self.preprocess_text(row['claim'])
+        context = self.preprocess_text(row['context'])
         ids = row['id']
         label = self.labelencoder(row['verdict'])
         

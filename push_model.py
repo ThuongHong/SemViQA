@@ -7,22 +7,15 @@ HF_TOKEN = "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"
 #           "ernie-m-large-mnli-xnli_viwiki_2class_focal_loss", "infoxlm-large_viwiki_2class_focal_loss","phobert-large_viwiki_2class_focal_loss",
 #           "ernie-m-large-mnli-xnli_isedsc_2class_focal_loss", "infoxlm-large_isedsc_2class_focal_loss","phobert-large_isedsc_2class_focal_loss"]
 models = [
-    "infoxlm-large_viwiki_evidence_origin", "vi-mrc-large_viwiki_evidence_origin",
-    "infoxlm-large_isedsc_evidence_origin", "vi-mrc-large_isedsc_evidence_origin",
-    "infoxlm-large_viwiki_qact"
+    "infoxlm-large_isedsc_3class_cross1"
 ]
 
 repo_base = "xuandin"
 api = HfApi(token=HF_TOKEN)
 
 for model_name in models:
-    if "/" in model_name:
-        model_name = model_name.split("/")[-1]
-     
-    if not os.path.isdir(model_name):
-        print(f"❌ Thư mục {model_name} không tồn tại, bỏ qua...")
-        continue
-
+    # if "/" in model_name:
+    #     model_name = model_name.split("/")[-1]
     repo_id = f"{repo_base}/{model_name}"
 
     try:
