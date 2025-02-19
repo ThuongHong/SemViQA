@@ -1,7 +1,7 @@
 # **SemViQA: A Semantic Question Answering System for Vietnamese Information Fact-Checking**  
 
 ### **Authors**:  
-*Nam V. Nguyen, Dien X. Tran, Thanh T. Tran, Anh T. Hoang, Tai V. Duong, Di T. Le, Phuc-Lu Le*  
+**Nam V. Nguyen**, **Dien X. Tran**, Thanh T. Tran, Anh T. Hoang, Tai V. Duong, Di T. Le, Phuc-Lu Le 
 
 <p align="center">
     <a href="#-quick-start">🚀 Quick Start</a> •
