@@ -1,12 +1,22 @@
-#!/bin/bash
-  
-export PYTHONPATH="/kaggle/working/SemViQA:$PYTHONPATH"
+nvidia-smi
+source ~/.bashrc
+
+while true; do nvidia-smi > gpu_status.txt; sleep 5; done &
+
+module load shared conda
+. $CONDAINIT
+conda activate sem_deep
+
+conda info --envs
+echo "Conda Environment: $CONDA_DEFAULT_ENV"
+
+export PYTHONPATH="SemViQA:$PYTHONPATH"
 echo "Starting the inference process..."
  
 DATA_PATH="data/test.json"
 OUTPUT_PATH="output.json"
-MODEL_EVIDENCE_QA="QACT"
-WEIGHT_EVIDENCE_QA="weights/QACT.pth"
+MODEL_EVIDENCE_QA="QATC"
+WEIGHT_EVIDENCE_QA="weights/QATC.pth"
 MODEL_2_CLASS="2_class"
 WEIGHT_2_CLASS="weights/2_class.pth"
 MODEL_3_CLASS="3_class"

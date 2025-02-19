@@ -1,22 +1,33 @@
-#!/bin/bash
+nvidia-smi
+source ~/.bashrc
 
-export PYTHONPATH="/kaggle/working/SemViQA:$PYTHONPATH"
-echo "Starting the training process..."
+while true; do nvidia-smi > gpu_status.txt; sleep 5; done &
 
-python3 src/training/classify.py \
-    --train_data "data/train.csv" \
-    --dev_data "data/dev.csv" \
-    --model_name "MoritzLaurer/ernie-m-large-mnli-xnli" \
+module load shared conda
+. $CONDAINIT
+conda activate sem_deep
+
+conda info --envs
+echo "Conda Environment: $CONDA_DEFAULT_ENV"
+
+export PYTHONPATH="SemViQA:$PYTHONPATH"
+echo "Running training script..."
+
+BS=104
+python3 claim_verification/main.py \
+    --train_data "train.csv" \
+    --dev_data "test.csv" \
+    --model_name "FacebookAI/xlm-roberta-large" \
     --lr 1e-5 \
-    --epochs 10 \
-    --accumulation_steps 2 \
-    --batch_size 8 \
+    --epochs 20 \
+    --accumulation_steps 1 \
+    --batch_size $BS \
     --max_len 256 \
     --num_workers 2 \
     --patience 5 \
-    --type_loss "cross_entropy" \ 
-    --output_dir "" \
+    --type_loss "focal_loss" \
+    --output_dir "./xlm-roberta-large_viwiki_2class_focal" \
     --n_classes 3\
-    
+    --is_weighted 1
 
-echo "Training process completed!"
+echo "Training script completed!"
