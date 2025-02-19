@@ -20,8 +20,7 @@ import argparse
 from torch.utils.tensorboard import SummaryWriter
 import time
 
-from model.qatc import QATC
-from model.SMOE.moe import MoELayer
+from model.qatc import QATC 
 from data_utils import load_data
 from loss import comboLoss
 
@@ -187,13 +186,7 @@ def main(args):
             
             # Calculate loss
             loss, loss_base, reg_loss, retation_tagg_loss = loss_fn(output=output)
-
-            balance_loss = 0.0
-            if args.use_smoe:
-                for layer in model.model.encoder.layer:
-                    if isinstance(layer.attention.output, MoELayer):
-                        balance_loss += layer.attention.output.last_balance_loss
-                loss += args.gama*balance_loss
+ 
             avg_loss = accelerator.gather(loss.repeat(args.train_batch_size)).mean()
             train_loss += avg_loss.item() / args.gradient_accumulation_steps
 
@@ -242,14 +235,13 @@ def main(args):
                         'Train loss': train_loss,
                         'Base loss': loss_base,
                         'retation tagg loss': retation_tagg_loss,
-                        'reg_loss': reg_loss,
-                        "Balance loss": balance_loss if args.use_smoe else -1,
+                        'reg_loss': reg_loss, 
                         "epoch": epoch,
                     })
                 train_loss = 0.0
         train_loss = round(train_loss / len(train_dataloader), 4) 
         epoch_training_time = time.time() - start_train_time
-        info_train = f"Epoch {epoch+1} - epoch_training_time: {epoch_training_time} - Train Loss: {train_loss} - Base Loss: {loss_base} - Retation Tagg Loss: {retation_tagg_loss} - Balance Loss: {balance_loss if args.use_smoe else -1}"
+        info_train = f"Epoch {epoch+1} - epoch_training_time: {epoch_training_time} - Train Loss: {train_loss} - Base Loss: {loss_base} - Retation Tagg Loss: {retation_tagg_loss}"
         print(info_train)
         logs.append(info_train)
 
@@ -258,7 +250,6 @@ def main(args):
             'Train loss': train_loss,
             'Base loss': loss_base,
             'retation tagg loss': retation_tagg_loss,
-            "Balance loss": balance_loss if args.use_smoe else -1,
         }
 
         if torch.isnan(torch.tensor(train_loss)):

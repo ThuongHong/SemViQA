@@ -4,24 +4,7 @@ import torch.nn.functional as F
 import torch.nn as nn
 import copy
 from models.SMOE.moe import MoELayer
-
-# Code model baseline 
-# class Rational_Tagging(nn.Module):
-#     def __init__(self,  hidden_size):
-#         super(Rational_Tagging, self).__init__()
-#         self.W1 = nn.Linear(hidden_size, hidden_size)
-#         self.w2 = nn.Linear(hidden_size, 1)
-
-#     def forward(self, h_t):
-#         h_1 = self.W1(h_t)
-#         # h_1 = F.relu(h_1)
-#         h_1 = F.gelu(h_1)
-#         p = self.w2(h_1)
-#         # p = torch.sigmoid(p) # (batch_size, seq_len, 1)
-#         p = F.softmax(p, dim=1)
-#         return p
-
-
+ 
 class Rational_Tagging(nn.Module):
     def __init__(self,  hidden_size):
         super(Rational_Tagging, self).__init__()
@@ -66,20 +49,6 @@ class QATC(nn.Module):
         )
         
         self.tagging = Rational_Tagging(self.model.config.hidden_size)
-        if self.config.use_smoe:
-            print("Using SMoe")
-            # Replace attention output with MoE layer
-            for layer in self.model.encoder.layer:
-                layer.attention.output = MoELayer(
-                    experts=[copy.deepcopy(layer.attention.output.dense) for _ in range(self.config.num_experts)],
-                    gate=nn.Sequential(
-                        nn.Linear(self.model.config.hidden_size, self.model.config.hidden_size),
-                        nn.ReLU(),
-                        nn.Linear(self.model.config.hidden_size, self.config.num_experts), 
-                    ),
-                    num_experts_per_token=self.config.num_experts_per_token,
-                    hidden_dim = self.model.config.hidden_size
-                )
         self.model.pooler = None
     def forward(self, input_ids, attention_mask):
         output = self.model( input_ids= input_ids, attention_mask = attention_mask)
