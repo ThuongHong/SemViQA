@@ -116,8 +116,8 @@ If you use **SemViQA** in your research, please cite our work:
 ```bibtex
 @article{semviqa2024,
   title={SemViQA: A Semantic Question Answering System for Vietnamese Information Fact-Checking},
-  author={Nguyen, Nam V. and Tran, Dien X. and Tran, Thanh T. and Hoang, Anh T. and Duong, Tai V. and Le, Di T. and Le, Phuc-Lu},
-  year={2024},
+  author={Nam V. Nguyen, Dien X. Tran, Thanh T. Tran, Anh T. Hoang, Tai V. Duong, Di T. Le, Phuc-Lu Le },
+  year={2025},
   journal={arXiv preprint arXiv:2402.xxxx}
 }
 ``` 
