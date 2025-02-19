@@ -69,14 +69,6 @@ pip install transformers==4.42.3
 pip install torch==2.3.0 torchvision==0.18.0 torchaudio==2.3.0 --index-url https://download.pytorch.org/whl/cu118
 pip install -r requirements.txt
 ```
-
-#### **4️⃣ Install FlashAttention (Optional, for performance boost)**  
-Choose the version based on your Torch version from the [FlashAttention Releases](https://github.com/Dao-AILab/flash-attention/releases).  
-Example for **Torch 2.1 + CUDA 11.8**:  
-```bash
-pip install https://github.com/Dao-AILab/flash-attention/releases/download/v2.6.3/flash_attn-2.6.3+cu118torch2.1cxx11abiFALSE-cp311-cp311-linux_x86_64.whl
-```
-
 ---
 
 ## 🏋️‍♂️ **Training**  
