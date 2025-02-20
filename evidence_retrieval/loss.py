@@ -131,8 +131,9 @@ class comboLoss(nn.Module):
         retation_tagg_loss  = self.RTLoss(pt = pt, Tagging = Tagging)
         # retation_tagg_loss = nn.BCELoss()(pt, Tagging)
         # retation_tagg_loss = 0
-        reg_loss = self.reg_loss_fn(pt, mask=attention_mask)
-        total_loss = self.alpha*loss_base + self.beta*retation_tagg_loss + reg_loss
+        # reg_loss = self.reg_loss_fn(pt, mask=attention_mask)
+        reg_loss = 0
+        total_loss = self.alpha*loss_base + self.beta*retation_tagg_loss 
         
         return total_loss, loss_base, reg_loss, retation_tagg_loss
 
