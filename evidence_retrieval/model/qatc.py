@@ -3,7 +3,7 @@ import torch
 import torch.nn.functional as F
 import torch.nn as nn
 import copy
-from models.SMOE.moe import MoELayer
+from model.SMOE.moe import MoELayer
 
 class Rational_Tagging(nn.Module):
     def __init__(self, hidden_size):
