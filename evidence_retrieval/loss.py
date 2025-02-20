@@ -89,13 +89,94 @@ class RTLoss(nn.Module):
         return total_loss/N
 
 
+# class comboLoss(nn.Module):
+#     def __init__(self, config):
+        
+#         super(comboLoss, self).__init__()
+#         self.alpha = config.alpha
+#         self.beta = config.beta
+#         # self.BaseLoss = BaseLoss()
+#         self.RTLoss = RTLoss()
+#         self.reg_loss_fn = RationaleRegularizationLoss(lambda_sparse=0.01, lambda_continuity=0.01)
+#         self.config = config
+        
+#     def forward(self, output: dict):
+#         attention_mask = output['attention_mask']
+#         start_logits = output['start_logits']
+#         end_logits = output['end_logits']
+        
+#         start_positions = output['start_positions']
+#         end_positions = output['end_positions']
+        
+#         Tagging = output['Tagging']
+#         pt = output['pt']
+
+#         loss_base = 0
+#         if start_positions is not None and end_positions is not None:
+#             # If we are on multi-GPU, split add a dimension
+#             if len(start_positions.size()) > 1:
+#                 start_positions = start_positions.squeeze(-1)
+#             if len(end_positions.size()) > 1:
+#                 end_positions = end_positions.squeeze(-1)
+#             # sometimes the start/end positions are outside our model inputs, we ignore these terms
+#             ignored_index = start_logits.size(1)
+#             start_positions = start_positions.clamp(0, ignored_index)
+#             end_positions = end_positions.clamp(0, ignored_index)
+
+#             loss_fct = CrossEntropyLoss(ignore_index=ignored_index)
+#             start_loss = loss_fct(start_logits, start_positions)
+#             end_loss = loss_fct(end_logits, end_positions)
+#             loss_base = (start_loss + end_loss) / 2
+#         retation_tagg_loss  = self.RTLoss(pt = pt, Tagging = Tagging)
+#         # retation_tagg_loss = nn.BCELoss()(pt, Tagging)
+#         # retation_tagg_loss = 0
+#         reg_loss = self.reg_loss_fn(pt, mask=attention_mask)
+#         total_loss = self.alpha*loss_base + self.beta*retation_tagg_loss + reg_loss
+        
+#         return total_loss, loss_base, reg_loss, retation_tagg_loss
+
+ 
+class FocalLoss(nn.Module):
+    def __init__(self, gamma=2.0, alpha=0.25, reduction='mean'):
+        """
+        Focal Loss để thay thế CrossEntropyLoss.
+        Args:
+            gamma (float): Điều chỉnh mức độ tập trung vào các mẫu khó (mặc định = 2.0).
+            alpha (float): Trọng số lớp dương để cân bằng (mặc định = 0.25).
+            reduction (str): 'mean' hoặc 'sum'.
+        """
+        super(FocalLoss, self).__init__()
+        self.gamma = gamma
+        self.alpha = alpha
+        self.reduction = reduction
+
+    def forward(self, logits, targets):
+        """
+        Args:
+            logits: (batch_size, seq_len, num_classes) - đầu ra của mô hình.
+            targets: (batch_size, seq_len) - nhãn thực tế.
+
+        Returns:
+            loss: Giá trị focal loss
+        """
+        ce_loss = F.cross_entropy(logits, targets, reduction='none')
+        pt = torch.exp(-ce_loss)  # Xác suất của lớp dự đoán đúng
+        focal_loss = self.alpha * (1 - pt) ** self.gamma * ce_loss
+
+        if self.reduction == 'mean':
+            return focal_loss.mean()
+        elif self.reduction == 'sum':
+            return focal_loss.sum()
+        else:
+            return focal_loss
+
 class comboLoss(nn.Module):
     def __init__(self, config):
-        
         super(comboLoss, self).__init__()
         self.alpha = config.alpha
         self.beta = config.beta
-        # self.BaseLoss = BaseLoss()
+        self.gamma = config.gamma  # Hệ số gamma cho Focal Loss
+        self.focal_loss_fn = FocalLoss(gamma=self.gamma, alpha=0.25, reduction='mean')
         self.RTLoss = RTLoss()
         self.reg_loss_fn = RationaleRegularizationLoss(lambda_sparse=0.01, lambda_continuity=0.01)
         self.config = config
@@ -113,24 +194,22 @@ class comboLoss(nn.Module):
 
         loss_base = 0
         if start_positions is not None and end_positions is not None:
-            # If we are on multi-GPU, split add a dimension
             if len(start_positions.size()) > 1:
                 start_positions = start_positions.squeeze(-1)
             if len(end_positions.size()) > 1:
                 end_positions = end_positions.squeeze(-1)
-            # sometimes the start/end positions are outside our model inputs, we ignore these terms
+
             ignored_index = start_logits.size(1)
             start_positions = start_positions.clamp(0, ignored_index)
             end_positions = end_positions.clamp(0, ignored_index)
 
-            loss_fct = CrossEntropyLoss(ignore_index=ignored_index)
-            start_loss = loss_fct(start_logits, start_positions)
-            end_loss = loss_fct(end_logits, end_positions)
+            # Sử dụng Focal Loss thay vì CrossEntropyLoss
+            start_loss = self.focal_loss_fn(start_logits, start_positions)
+            end_loss = self.focal_loss_fn(end_logits, end_positions)
             loss_base = (start_loss + end_loss) / 2
-        retation_tagg_loss  = self.RTLoss(pt = pt, Tagging = Tagging)
-        # retation_tagg_loss = nn.BCELoss()(pt, Tagging)
-        # retation_tagg_loss = 0
+
+        retation_tagg_loss = self.RTLoss(pt=pt, Tagging=Tagging)
         reg_loss = self.reg_loss_fn(pt, mask=attention_mask)
-        total_loss = self.alpha*loss_base + self.beta*retation_tagg_loss + reg_loss
+        total_loss = self.alpha * loss_base + self.beta * retation_tagg_loss + reg_loss
         
         return total_loss, loss_base, reg_loss, retation_tagg_loss

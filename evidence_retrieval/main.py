@@ -243,7 +243,6 @@ def main(args):
         epoch_training_time = time.time() - start_train_time
         info_train = f"Epoch {epoch+1} - epoch_training_time: {epoch_training_time} - Train Loss: {train_loss} - Base Loss: {loss_base} - Retation Tagg Loss: {retation_tagg_loss}"
         print(info_train)
-        logs.append(info_train)
 
         info_epoch[epoch] = {
             "Time train": epoch_training_time,
