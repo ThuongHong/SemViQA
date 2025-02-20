@@ -175,8 +175,7 @@ class comboLoss(nn.Module):
         super(comboLoss, self).__init__()
         self.alpha = config.alpha
         self.beta = config.beta
-        self.gamma = config.gamma  # Hệ số gamma cho Focal Loss
-        self.focal_loss_fn = FocalLoss(gamma=self.gamma, alpha=0.25, reduction='mean')
+        self.focal_loss_fn = FocalLoss(gamma=2, alpha=0.25, reduction='mean')
         self.RTLoss = RTLoss()
         self.reg_loss_fn = RationaleRegularizationLoss(lambda_sparse=0.01, lambda_continuity=0.01)
         self.config = config
