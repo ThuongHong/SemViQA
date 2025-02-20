@@ -49,14 +49,18 @@ class QATC(nn.Module):
         )
         
         self.tagging = Rational_Tagging(self.model.config.hidden_size)
+        self.rationale_fc = nn.Linear(self.model.config.hidden_size, self.model.config.hidden_size)
         self.model.pooler = None
     def forward(self, input_ids, attention_mask):
         output = self.model( input_ids= input_ids, attention_mask = attention_mask)
         
         qa_ouputs = output[0]
         pt =  self.tagging(qa_ouputs)
+
+        rationale_embedding = self.rationale_fc(qa_ouputs) * pt
+        enhanced_outputs = qa_ouputs + rationale_embedding
         
-        logits = self.qa_outputs(qa_ouputs) 
+        logits = self.qa_outputs(enhanced_outputs) 
         start_logits, end_logits = logits.split(1, dim=-1)
         start_logits = start_logits.squeeze(-1).contiguous()
         end_logits = end_logits.squeeze(-1).contiguous()
