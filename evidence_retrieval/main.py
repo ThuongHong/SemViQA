@@ -336,7 +336,6 @@ def main(args):
         epoch_eval_time = time.time() - start_eval_time
         info_eval = f"Epoch {epoch+1} - epoch_eval_time: {epoch_eval_time} - Accuracy: {accuracy} - Eval Loss: {eval_loss} - F1: {eval_f1} - Kappa: {eval_kappa} - Matthews Corrcoef: {eval_matthews_corrcoef}"
         print(info_eval)
-        logs.append(info_eval)
 
         info_epoch[epoch]= {
             "Time eval": epoch_eval_time,
