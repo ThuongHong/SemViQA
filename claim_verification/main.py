@@ -54,7 +54,7 @@ def main(args):
         tokenizer = XLMRobertaTokenizerFast.from_pretrained(args.model_name)
     else:
         tokenizer = AutoTokenizer.from_pretrained(args.model_name)
-    model = ClaimVerification(n_classes=args.n_classes, name_model=args.model_name, num_experts=args.num_experts, n_layers=args.n_layers, dropout_prob=args.dropout_prob, rank=args.rank, num_experts_per_token=args.num_experts_per_token, temperature=args.temperature).to(device)
+    model = ClaimVerification(n_classes=args.n_classes, name_model=args.model_name).to(device)
     count_parameters(model)
 
     train_dataset = Data(train_data, tokenizer, args, max_len=args.max_len)
@@ -251,12 +251,7 @@ def parse_args():
     parser.add_argument('--output_dir', type=str, default='output')
     parser.add_argument('--n_classes', type=int, default=3)
     parser.add_argument('--is_weighted', type=int, default=0)
-    parser.add_argument('--num_experts', type=int, default=4)
-    parser.add_argument('--n_layers', type=int, default=2)
     parser.add_argument('--dropout_prob', type=float, default=0.3)
-    parser.add_argument('--rank', type=int, default=8)
-    parser.add_argument('--num_experts_per_token', type=int, default=2)
-    parser.add_argument('--temperature', type=float, default=1.0)
     return parser.parse_args()
 
 if __name__ == '__main__':
