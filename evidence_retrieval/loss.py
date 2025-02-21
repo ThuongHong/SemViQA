@@ -128,9 +128,9 @@ class comboLoss(nn.Module):
             start_loss = loss_fct(start_logits, start_positions)
             end_loss = loss_fct(end_logits, end_positions)
             loss_base = (start_loss + end_loss) / 2
-        # retation_tagg_loss  = self.RTLoss(pt = pt, Tagging = Tagging)
+        retation_tagg_loss  = self.RTLoss(pt = pt, Tagging = Tagging)
         # retation_tagg_loss = nn.BCELoss()(pt, Tagging)
-        retation_tagg_loss = 0
+        # retation_tagg_loss = 0
         reg_loss = self.reg_loss_fn(pt, mask=attention_mask)
         # reg_loss = 0
         total_loss = self.alpha*loss_base + reg_loss + self.beta*retation_tagg_loss 
