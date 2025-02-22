@@ -23,8 +23,7 @@ class Data(Dataset):
             padding='max_length',
             return_attention_mask=True,
             return_token_type_ids=False,
-            return_tensors='pt',
-            return_overflowing_tokens=True
+            return_tensors='pt', 
         )
         
         return {
