@@ -24,6 +24,7 @@ class Data(Dataset):
             return_attention_mask=True,
             return_token_type_ids=False,
             return_tensors='pt',
+            return_overflowing_tokens=True
         )
         
         return {
