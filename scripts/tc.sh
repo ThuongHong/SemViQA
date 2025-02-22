@@ -28,6 +28,6 @@ python3 claim_verification/main.py \
     --type_loss "focal_loss" \
     --output_dir "./xlm-roberta-large_viwiki_2class_focal" \
     --n_classes 3\
-    --is_weighted 1
+    --is_weighted 0
 
 echo "Training script completed!"
