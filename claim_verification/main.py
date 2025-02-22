@@ -17,7 +17,7 @@ import multiprocessing
 
 from data_utils import Data
 from SemViQA.claim_verification.model import ClaimVerification
-from loss import focal_loss
+from loss import focal_loss, FocalLoss
 
 multiprocessing.set_start_method('spawn', force=True)
 
@@ -69,7 +69,7 @@ def main(args):
     if args.type_loss == "cross_entropy":
         criterion = nn.CrossEntropyLoss(weight=weights)
     else:
-        criterion = focal_loss(alpha= 0.25)
+        criterion = FocalLoss(alpha= 0.25)
 
 
     optimizer = AdamW(model.parameters(), lr=args.lr)
