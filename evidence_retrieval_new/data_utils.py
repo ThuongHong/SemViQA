@@ -100,7 +100,7 @@ def load_data(config):
 
         train.id = range(len(train))
         train = train.astype(str)
-        train["context"] = train["context"].apply(change_context)   
+        # train["context"] = train["context"].apply(change_context)   
 
         train = Dataset.from_dict({
             "context": train.context,
@@ -121,7 +121,7 @@ def load_data(config):
 
         test.id = range(len(test))
         test = test.astype(str)
-        test["context"] = test["context"].apply(change_context)
+        # test["context"] = test["context"].apply(change_context)
 
         test = Dataset.from_dict({
             "context": test.context,
