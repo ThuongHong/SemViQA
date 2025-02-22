@@ -16,7 +16,7 @@ import time
 import multiprocessing
 
 from data_utils import Data
-from SemViQA.claim_verification.model import ClaimVerification
+from model import ClaimVerification
 from loss import focal_loss, FocalLoss
 
 multiprocessing.set_start_method('spawn', force=True)
