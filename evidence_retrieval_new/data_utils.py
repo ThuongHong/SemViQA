@@ -14,13 +14,15 @@ def split_sentence(paragraph: str) -> list:
         updated_list.extend(split_chill(context) if '. ' in context else [context])
     return updated_list
 
+def change_context(context):
+    subtexts = split_sentence(context)
+    return " [SEP] ".join(subtexts)
+
 def preprocess_training_dataset(examples, tokenizer, config):
     questions = [q.strip() for q in examples["claim"]]
-    subtexts = split_sentence(examples["context"])
-    contexts = [" [SEP] ".join(ctx) for ctx in subtexts]
     inputs = tokenizer(
         questions,
-        contexts,
+        examples["context"],
         max_length=512,
         truncation="only_second",
         return_offsets_mapping=True,
@@ -98,6 +100,7 @@ def load_data(config):
 
         train.id = range(len(train))
         train = train.astype(str)
+        train["context"] = train["context"].apply(change_context)   
 
         train = Dataset.from_dict({
             "context": train.context,
@@ -118,6 +121,7 @@ def load_data(config):
 
         test.id = range(len(test))
         test = test.astype(str)
+        test["context"] = test["context"].apply(change_context)
 
         test = Dataset.from_dict({
             "context": test.context,
