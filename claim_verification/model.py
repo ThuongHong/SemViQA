@@ -12,12 +12,12 @@ class AttentionPooling(nn.Module):
         return pooled_output
 
 class ClaimVerification(nn.Module):
-    def __init__(self, name_model):
+    def __init__(self, n_classes, name_model):
         super(ClaimVerification, self).__init__()
         self.bert = AutoModel.from_pretrained(name_model)
         self.attn_pooling = AttentionPooling(self.bert.config.hidden_size)
         self.drop = nn.Dropout(p=0.3)
-        self.fc = nn.Linear(self.bert.config.hidden_size, 3)
+        self.fc = nn.Linear(self.bert.config.hidden_size, n_classes)
 
     def forward(self, input_ids, attention_mask):
         outputs = self.bert(input_ids=input_ids, attention_mask=attention_mask, return_dict=True)
