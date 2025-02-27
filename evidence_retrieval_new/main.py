@@ -172,7 +172,7 @@ def main(args):
             for key in batch:
                 batch[key] = batch[key].to(accelerator.device)
             Tagging = batch['Tagging'].to(torch.float32)
-            pt, start_logits, end_logits = model(input_ids=batch['input_ids'], attention_mask=batch['attention_mask'])
+            pt, start_logits, end_logits, similarity_matrix = model(input_ids=batch['input_ids'], attention_mask=batch['attention_mask'], candidate_starts=batch['start_positions'], candidate_ends=batch['end_positions'])
 
             output = {
                 "attention_mask": batch['attention_mask'],
@@ -182,6 +182,7 @@ def main(args):
                 "end_positions": batch['end_positions'],
                 "Tagging": Tagging, 
                 "pt": pt,
+                "similarity_matrix": similarity_matrix
             }
             
             # Calculate loss
@@ -268,7 +269,7 @@ def main(args):
                 for key in batch:
                     batch[key] = batch[key].to("cuda")
                 Tagging = batch['Tagging'].to(torch.float32)
-                pt, start_logits, end_logits = model(input_ids=batch['input_ids'], attention_mask=batch['attention_mask'])
+                pt, start_logits, end_logits, _ = model(input_ids=batch['input_ids'], attention_mask=batch['attention_mask'])
 
                 output = {
                     "attention_mask": batch['attention_mask'],
