@@ -177,50 +177,9 @@ class QATC(nn.Module):
         
         # Remove pooler to focus on token-level representations
         self.model.pooler = None
-        
-    def generate_candidate_spans(self, hidden_states, rationale_probs, max_span_length=30):
-        """Generate candidate spans based on rationale probabilities"""
-        batch_size, seq_len, _ = hidden_states.size()
-        candidate_starts = []
-        candidate_ends = []
-        
-        # Find tokens with high rationale probability
-        for i in range(batch_size):
-            probs = rationale_probs[i].squeeze(-1)
-            # Get indices of tokens with probability > threshold
-            high_prob_indices = torch.where(probs > 0.5)[0]
-            
-            if len(high_prob_indices) == 0:
-                # If no high probability tokens, use top-k
-                high_prob_indices = torch.topk(probs, min(5, seq_len))[1]
-            
-            # Generate candidate spans
-            batch_starts = []
-            batch_ends = []
-            
-            for start_idx in high_prob_indices:
-                end_candidates = torch.arange(start_idx, min(start_idx + max_span_length, seq_len))
-                end_candidates = end_candidates[torch.logical_and(
-                    end_candidates < seq_len,
-                    probs[end_candidates] > 0.3  # Lower threshold for end tokens
-                )]
-                
-                if len(end_candidates) > 0:
-                    batch_starts.extend([start_idx] * len(end_candidates))
-                    batch_ends.extend(end_candidates)
-            
-            # If no valid spans found, use the token with highest probability
-            if not batch_starts:
-                highest_idx = torch.argmax(probs)
-                batch_starts = [highest_idx]
-                batch_ends = [highest_idx]
-                
-            candidate_starts.append(torch.tensor(batch_starts, device=hidden_states.device))
-            candidate_ends.append(torch.tensor(batch_ends, device=hidden_states.device))
-            
-        return candidate_starts, candidate_ends
     
-    def forward(self, input_ids, attention_mask, candidate_starts=None, candidate_ends=None):
+    
+    def forward(self, input_ids, attention_mask):
         # Get base embeddings from language model
         outputs = self.model(input_ids=input_ids, attention_mask=attention_mask)
         hidden_states = outputs[0]
@@ -239,16 +198,6 @@ class QATC(nn.Module):
         global_context = torch.mean(contextual_states * rationale_probs, dim=1, keepdim=True)
         global_context = self.global_context(global_context)
         enhanced_states = contextual_states + global_context.expand(-1, seq_len, -1)
-        
-        # 5. Generate candidate spans if not provided (during inference)
-        if candidate_starts is None or candidate_ends is None:
-            candidate_starts, candidate_ends = self.generate_candidate_spans(enhanced_states, rationale_probs)
-            
-        # 6. Apply contrastive boundary learning (during training)
-        if self.config.is_train:
-            similarity_matrix = self.contrastive_boundary(enhanced_states, candidate_starts, candidate_ends)
-        else:
-            similarity_matrix = None
             
         # 7. Predict uncertainty scores
         uncertainty_scores = self.uncertainty_modeling(enhanced_states)
@@ -266,4 +215,4 @@ class QATC(nn.Module):
         start_logits = start_logits * (1 - torch.sigmoid(start_uncertainty.squeeze(-1)))
         end_logits = end_logits * (1 - torch.sigmoid(end_uncertainty.squeeze(-1)))
         
-        return rationale_probs, start_logits, end_logits, similarity_matrix
+        return rationale_probs, start_logits, end_logits
