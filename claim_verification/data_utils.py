@@ -36,7 +36,7 @@ class Data(Dataset):
 
     def labelencoder(self, text):
         label_map = {
-            3: {'NEI': 0, 'NEI0': 0, 'SUPPORTED': 1, 'REFUTED': 2},
+            3: {'NEI': 0, 'SUPPORTED': 1, 'REFUTED': 2},
             2: {'SUPPORTED': 0, 'REFUTED': 1} 
         }
         return label_map[self.config.n_classes].get(text, 1)
