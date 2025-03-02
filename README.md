@@ -5,8 +5,8 @@
 
 <p align="center">
     <a href="#-about">📌 About</a> •
-    <a href="#-about">📌 About</a> •
-    <a href="#-checkpoints">🚀 Quick Start</a> •
+    <a href="#-checkpoints">🔍 Checkpoints</a> •
+    <a href="#-quick-start">🚀 Quick Start</a> •
     <a href="#-training">🏋️‍♂️ Training</a> •
     <a href="#-pipeline">🧪 Pipeline</a> •
     <a href="#-citation">📖 Citation</a>
