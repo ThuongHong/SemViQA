@@ -48,38 +48,53 @@ These results establish **SemViQA** as a **benchmark for Vietnamese fact verific
   <tr>
     <td rowspan="3"><strong>TC</strong></td>
     <td>InfoXLM<sub>large</sub></td>
-    <td>X.XX</td>
-    <td>Y.YY</td>
+    <td></td>
+    <td>[Link](https://huggingface.co/xuandin/infoxlm-large_isedsc_3class_cross)</td>
   </tr>
   <tr>
     <td>XLM-R<sub>large</sub></td>
     <td>X.XX</td>
-    <td>Y.YY</td>
+    <td>[Link](https://huggingface.co/xuandin/xlm-roberta-large_isedsc_3class_cross)</td>
   </tr>
   <tr>
     <td>Ernie-M<sub>large</sub></td>
-    <td>X.XX</td>
+    <td>[Link](https://huggingface.co/xuandin/ernie-m-large-mnli-xnli_viwiki_3class_cross)</td>
     <td>Y.YY</td>
   </tr>
   <tr>
     <td rowspan="3"><strong>BC</strong></td>
     <td>InfoXLM<sub>large</sub></td>
-    <td>X.XX</td>
-    <td>Y.YY</td>
+    <td>[Link](https://huggingface.co/xuandin/infoxlm-large_viwiki_2class_focal)</td>
+    <td>[Link](https://huggingface.co/xuandin/infoxlm-large_isedsc_2class_focal)</td>
   </tr>
   <tr>
     <td>XLM-R<sub>large</sub></td>
-    <td>X.XX</td>
-    <td>Y.YY</td>
+    <td>[Link](https://huggingface.co/xuandin/xlm-roberta-large_viwiki_2class_focal)</td>
+    <td>[Link](https://huggingface.co/xuandin/xlm-roberta-large_isedsc_2class_focal)</td>
   </tr>
   <tr>
     <td>Ernie-M<sub>large</sub></td>
+    <td>[Link](https://huggingface.co/xuandin/ernie-m-large-mnli-xnli_viwiki_2class_focal)</td>
+    <td>Y.YY</td>
+  </tr>
+  <tr>
+    <td rowspan="2"><strong>QATC</strong></td>
+    <td>InfoXLM<sub>large</sub></td>
+    <td>[Link](https://huggingface.co/xuandin/infoxlm-large_viwiki_qatc)</td>
+    <td>[Link](https://huggingface.co/xuandin/infoxlm-large_isedsc_qatc)</td>
+  </tr>
+  <tr>
+    <td>ViMRC<sub>large</sub></td>
+    <td>[Link](https://huggingface.co/xuandin/vi-mrc-large_viwiki_qatc)</td>
+    <td>[Link](https://huggingface.co/xuandin/vi-mrc-large_isedsc_qatc)</td>
+  </tr>
+    <td rowspan="2"><strong>QA origin</strong></td>
+    <td>InfoXLM<sub>large</sub></td>
     <td>X.XX</td>
     <td>Y.YY</td>
   </tr>
   <tr>
-    <td><strong>QATC</strong></td>
-    <td>Model E</td>
+    <td>ViMRC<sub>large</sub></td>
     <td>X.XX</td>
     <td>Y.YY</td>
   </tr>
