@@ -47,23 +47,33 @@ These results establish **SemViQA** as a **benchmark for Vietnamese fact verific
   </tr>
   <tr>
     <td rowspan="3"><strong>TC</strong></td>
-    <td>Model A</td>
+    <td>InfoXLM<sub>large</sub></td>
     <td>X.XX</td>
     <td>Y.YY</td>
   </tr>
   <tr>
-    <td>Model B</td>
+    <td>XLM-R<sub>large</sub></td>
     <td>X.XX</td>
     <td>Y.YY</td>
   </tr>
   <tr>
-    <td>Model C</td>
+    <td>Ernie-M<sub>large</sub></td>
     <td>X.XX</td>
     <td>Y.YY</td>
   </tr>
   <tr>
-    <td><strong>BC</strong></td>
-    <td>Model D</td>
+    <td rowspan="3"><strong>BC</strong></td>
+    <td>InfoXLM<sub>large</sub></td>
+    <td>X.XX</td>
+    <td>Y.YY</td>
+  </tr>
+  <tr>
+    <td>XLM-R<sub>large</sub></td>
+    <td>X.XX</td>
+    <td>Y.YY</td>
+  </tr>
+  <tr>
+    <td>Ernie-M<sub>large</sub></td>
     <td>X.XX</td>
     <td>Y.YY</td>
   </tr>
