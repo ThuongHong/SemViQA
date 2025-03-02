@@ -36,7 +36,12 @@ These results establish **SemViQA** as a **benchmark for Vietnamese fact verific
 
 ---
 ## 🔍 Checkpoints
+We are making our **SemViQA** experiment checkpoints publicly available to support the **Vietnamese fact-checking research community**. By sharing these models, we aim to:  
 
+- **Facilitate reproducibility**: Allow researchers and developers to validate and build upon our results.  
+- **Save computational resources**: Enable fine-tuning or transfer learning on top of **pre-trained and fine-tuned models** instead of training from scratch.  
+- **Encourage further improvements**: Provide a strong baseline for future advancements in **Vietnamese misinformation detection**.  
+ 
 
 <table>
   <tr>
