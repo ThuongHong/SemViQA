@@ -4,8 +4,9 @@
 **Nam V. Nguyen**, **Dien X. Tran**, Thanh T. Tran, Anh T. Hoang, Tai V. Duong, Di T. Le, Phuc-Lu Le 
 
 <p align="center">
-    <a href="#-quick-start">🚀 Quick Start</a> •
     <a href="#-about">📌 About</a> •
+    <a href="#-about">📌 About</a> •
+    <a href="#-checkpoints">🚀 Quick Start</a> •
     <a href="#-training">🏋️‍♂️ Training</a> •
     <a href="#-pipeline">🧪 Pipeline</a> •
     <a href="#-citation">📖 Citation</a>
