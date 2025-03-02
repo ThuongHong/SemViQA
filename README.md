@@ -35,6 +35,48 @@ To address these challenges, we introduce **SemViQA**, a novel **Vietnamese fact
 These results establish **SemViQA** as a **benchmark for Vietnamese fact verification**, advancing efforts to combat misinformation and ensure **information integrity**.  
 
 ---
+## 🔍 Checkpoints
+
+
+<table>
+  <tr>
+    <th>Method</th>
+    <th>Model</th>
+    <th>ViWikiFC</th>
+    <th>ISE-DSC01</th>
+  </tr>
+  <tr>
+    <td rowspan="3"><strong>TC</strong></td>
+    <td>Model A</td>
+    <td>X.XX</td>
+    <td>Y.YY</td>
+  </tr>
+  <tr>
+    <td>Model B</td>
+    <td>X.XX</td>
+    <td>Y.YY</td>
+  </tr>
+  <tr>
+    <td>Model C</td>
+    <td>X.XX</td>
+    <td>Y.YY</td>
+  </tr>
+  <tr>
+    <td><strong>BC</strong></td>
+    <td>Model D</td>
+    <td>X.XX</td>
+    <td>Y.YY</td>
+  </tr>
+  <tr>
+    <td><strong>QATC</strong></td>
+    <td>Model E</td>
+    <td>X.XX</td>
+    <td>Y.YY</td>
+  </tr>
+</table>
+ 
+
+---
 
 ## 🚀 **Quick Start**  
 
