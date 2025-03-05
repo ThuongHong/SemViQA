@@ -2,7 +2,11 @@
 
 ### **Authors**:  
 [**Nam V. Nguyen**](https://github.com/DAVID-NGUYEN-S16), [**Dien X. Tran**](https://github.com/xndien2004), Thanh T. Tran, Anh T. Hoang, Tai V. Duong, Di T. Le, Phuc-Lu Le 
-
+<p align="center">
+  <a href="https://arxiv.org/abs/2503.00955">
+    <img src="https://img.shields.io/badge/arXiv-2411.00918-red?style=flat&label=arXiv">
+  </a>
+</p>
 <p align="center">
     <a href="#-about">📌 About</a> •
     <a href="#-checkpoints">🔍 Checkpoints</a> •
