@@ -190,10 +190,13 @@ Our development is based on our previous works:
 If you use **SemViQA** in your research, please cite our work:  
 
 ```bibtex
-@article{semviqa2024,
-  title={SemViQA: A Semantic Question Answering System for Vietnamese Information Fact-Checking},
-  author={Nam V. Nguyen, Dien X. Tran, Thanh T. Tran, Anh T. Hoang, Tai V. Duong, Di T. Le, Phuc-Lu Le},
-  year={2025},
-  journal={https://arxiv.org/abs/2503.00955}
+@misc{nguyen2025semviqasemanticquestionanswering,
+      title={SemViQA: A Semantic Question Answering System for Vietnamese Information Fact-Checking}, 
+      author={Nam V. Nguyen and Dien X. Tran and Thanh T. Tran and Anh T. Hoang and Tai V. Duong and Di T. Le and Phuc-Lu Le},
+      year={2025},
+      eprint={2503.00955},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2503.00955}, 
 }
 ```  
