@@ -179,7 +179,7 @@ Our development is based on our previous works:
 - [Check-Fact-Question-Answering-System](https://github.com/DAVID-NGUYEN-S16/Check-Fact-Question-Answering-System)  
 - [Extract-Evidence-Question-Answering](https://github.com/DAVID-NGUYEN-S16/Extract-evidence-question-answering)  
 
-**SemViQA** is the final version we have developed for verifying fact-checking in Vietnamese.  
+**SemViQA** is the final version we have developed for verifying fact-checking in Vietnamese, achieving state-of-the-art (SOTA) performance compared to any other system for Vietnamese.
 
 ## 📖 **Citation**  
 
