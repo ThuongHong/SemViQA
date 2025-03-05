@@ -103,6 +103,7 @@ def main(args):
 
     print("Starting training...")
     global_step = 1
+    cnt = 0
     start_time = time.time()
 
     for epoch in range(args.num_train_epochs):
@@ -165,10 +166,18 @@ def main(args):
         print(f"Epoch {epoch+1} - Eval Loss: {eval_loss} - Accuracy: {accuracy}")
 
         if accuracy > best_acc:
+            save_path = os.path.join(args.output_dir, f"best {args.name}")
+            if not os.path.exists(save_path):
+                os.makedirs(save_path)
+            accelerator.save_state(save_path)
             best_acc = accuracy
-            save_path = os.path.join(args.output_dir, "best_model.pth")
-            torch.save(model.state_dict(), save_path)
-            print("Saved best model.")
+            print("Save model best acc at epoch", epoch)
+            cnt = 0
+        else:
+            cnt += 1
+        if cnt == args.patience:
+            print(f"Early stopping at epoch {epoch}.")
+            break
 
     print("Training completed in:", time.time() - start_time, "seconds.")
 
