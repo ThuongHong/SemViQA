@@ -120,6 +120,5 @@ class QATCForQuestionAnswering(PreTrainedModel):
             start_logits=start_logits,
             end_logits=end_logits,
             hidden_states=outputs.hidden_states if output_hidden_states else None,
-            attentions=outputs.attentions if output_attentions else None,
-            rational_tag_logits=rational_tag_logits
+            attentions=outputs.attentions if output_attentions else None
         )

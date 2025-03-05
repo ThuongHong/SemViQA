@@ -36,7 +36,8 @@ def load_models(args):
         beta=args.beta
     )
     
-    model = QATCForQuestionAnswering.from_pretrained(args.model_name, config=config)
+    # model = QATCForQuestionAnswering.from_pretrained(args.model_name, config=config)
+    model = QATCForQuestionAnswering(config)
     
     if args.is_load_weight:
         print("loading train weight")
