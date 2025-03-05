@@ -172,25 +172,57 @@ def main(args):
     print("Training completed in:", time.time() - start_time, "seconds.")
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Train and evaluate QATCForQuestionAnswering")
+    parser = argparse.ArgumentParser(description="Evaluate VNFASHIONDIFF")
     
-    parser.add_argument("--model_name", type=str, default="/kaggle/input/model-base")
-    parser.add_argument("--output_dir", type=str, default="/kaggle/working/")
-    parser.add_argument("--seed", type=int, default=40)
-    parser.add_argument("--logging_dir", type=str, default="logs")
-    parser.add_argument("--train_batch_size", type=int, default=12)
-    parser.add_argument("--num_train_epochs", type=int, default=100)
-    parser.add_argument("--gradient_accumulation_steps", type=int, default=2)
-    parser.add_argument("--learning_rate", type=float, default=1e-5)
-    parser.add_argument("--report_to", type=str, default="wandb")
-    parser.add_argument("--freeze_text_encoder", type=int, default=0)
-    parser.add_argument("--alpha", type=float, default=1.0)
-    parser.add_argument("--beta", type=float, default=0.1)
-    parser.add_argument("--is_load_weight", type=int, default=0)
-    parser.add_argument("--weight_model", type=str, default="/kaggle/input/weight-QACT/pytorch_model.bin")
+    # W&B related arguments
+    parser.add_argument("--key_wandb", type=str, default="", help="Wandb API Key")
+    parser.add_argument("--project", type=str, default="Find-Evidence-Retrieval", help="Wandb project name")
+    parser.add_argument("--tags", type=str, default="Full-Data", help="Wandb tags")
+    parser.add_argument("--name", type=str, default="Find-Evidence", help="Wandb run name")
+    
+    # Model and training related arguments
+    parser.add_argument("--model_name", type=str, default="/kaggle/input/model-base", help="Path to the base model")
+    parser.add_argument("--path_finetune_model", type=int, default=0, help="Path to fine-tuned model")
+    parser.add_argument("--output_dir", type=str, default="/kaggle/working/", help="Output directory")
+    parser.add_argument("--seed", type=int, default=40, help="Random seed")
+    parser.add_argument("--logging_dir", type=str, default="logs", help="Logging directory")
+    parser.add_argument("--train_batch_size", type=int, default=12, help="Training batch size")
+    parser.add_argument("--num_train_epochs", type=int, default=100, help="Number of training epochs")
+    parser.add_argument("--num_epoch_eval", type=int, default=1, help="Number of epochs to evaluate")
+    parser.add_argument("--gradient_accumulation_steps", type=int, default=2, help="Gradient accumulation steps")
+    parser.add_argument("--use_8bit_adam", type=int, default=None, help="Use 8-bit Adam optimizer")
+    parser.add_argument("--learning_rate", type=float, default=0.00001, help="Learning rate")
+    parser.add_argument("--max_lr", type=float, default=0.00003, help="Maximum learning rate")
+    parser.add_argument("--max_grad_norm", type=float, default=1.0, help="Maximum gradient norm")
+    parser.add_argument("--report_to", type=str, default="wandb", help="Reporting destination (e.g., 'wandb')")
+    
+    # Data related arguments
+    parser.add_argument("--train_data", type=str, default='train.csv', help="Path to training data")
+    parser.add_argument("--eval_data", type=str, default='test.csv', help="Path to evaluation data")
+    
+    # Mixture of Experts (MoE) related arguments
+    parser.add_argument("--use_smoe", type=int, default=0, help="Use SMOE instead of MOE")
+    parser.add_argument("--num_experts", type=int, default=4, help="Number of experts in MoE")
+    parser.add_argument("--num_experts_per_token", type=int, default=2, help="Number of experts per token in MoE")
 
-    return parser.parse_args()
+    # Others
+    parser.add_argument("--freeze_text_encoder", type=int, default=0, help="Whether to freeze the text encoder")
+    parser.add_argument("--beta", type=float, default=0.1, help="Beta value for MoE")
+    parser.add_argument("--alpha", type=float, default=1, help="Alpha value for MoE")
+    parser.add_argument("--gama", type=float, default=0.1, help="Gama value for MoE")
+    parser.add_argument("--is_load_weight", type=int, default=0, help="Load weights from pre-trained model")
+    parser.add_argument("--weight_model", type=str, default="/kaggle/input/weight-QACT/pytorch_model.bin", help="Path to model weights")
+    parser.add_argument("--weight_optimizer", type=str, default="/kaggle/input/weight-QACT/optimizer.bin", help="Path to optimizer weights")
+    parser.add_argument("--weight_scheduler", type=str, default="/kaggle/input/weight-QACT/scheduler.bin", help="Path to scheduler weights")
+    parser.add_argument("--max_iter", type=int, default=100, help="Maximum number of iterations")
+    parser.add_argument("--show_loss", type=int, default=1, help="Whether to display loss during training")
+    parser.add_argument("--is_train", type=int, default=1, help="Set to True if training")
+    parser.add_argument("--is_eval", type=int, default=1, help="Set to Eval")
+    parser.add_argument("--stop_threshold", type=float, default=0.0005, help="Stop threshold")
 
+    parser.add_argument("--patience", type=int, default=5, help="Patience for early stopping")
+    args = parser.parse_args()
+    return args
 if __name__ == "__main__":
     args = parse_args()
     main(args)
