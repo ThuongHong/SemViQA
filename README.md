@@ -174,7 +174,12 @@ Use the trained models to **predict test data**:
 bash scripts/pipeline.sh
 ```
 
----
+## Acknowledgment  
+Our development is based on our previous works:  
+- [Check-Fact-Question-Answering-System](https://github.com/DAVID-NGUYEN-S16/Check-Fact-Question-Answering-System)  
+- [Extract-Evidence-Question-Answering](https://github.com/DAVID-NGUYEN-S16/Extract-evidence-question-answering)  
+
+**SemViQA** is the final version we have developed for verifying fact-checking in Vietnamese.  
 
 ## 📖 **Citation**  
 
@@ -183,8 +188,8 @@ If you use **SemViQA** in your research, please cite our work:
 ```bibtex
 @article{semviqa2024,
   title={SemViQA: A Semantic Question Answering System for Vietnamese Information Fact-Checking},
-  author={Nam V. Nguyen, Dien X. Tran, Thanh T. Tran, Anh T. Hoang, Tai V. Duong, Di T. Le, Phuc-Lu Le },
+  author={Nam V. Nguyen, Dien X. Tran, Thanh T. Tran, Anh T. Hoang, Tai V. Duong, Di T. Le, Phuc-Lu Le},
   year={2025},
-  journal={arXiv preprint arXiv:2402.xxxx}
+  journal={https://arxiv.org/abs/2503.00955}
 }
-``` 
+```  
