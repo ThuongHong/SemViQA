@@ -9,7 +9,7 @@ from safetensors.torch import load_model
 
 from data_processing.pipline import split_sentence, process_data, load_data
 from SemViQA.claim_verification.model import ClaimVerification
-from evidence_retrieval.model.qatc import QATC
+from SemViQA.evidence_retrieval.qatc_model import QATC
 from eval import three_class_classification, binary_classification, qatc, qatc_faster, bm25_topk, tfidf_topk, sbert_topk
 import argparse
 
