@@ -140,10 +140,8 @@ def main(args):
 
             avg_loss = accelerator.gather(loss.repeat(args.train_batch_size)).mean()
             train_loss += avg_loss.item() / args.gradient_accumulation_steps
-            # train_loss /= args.gradient_accumulation_steps
             logs = {"step": f"{step}/{len(train_dataloader)}", "step_loss": loss.detach().item(), "lr": lr_scheduler.get_last_lr()[0]}
             progress_bar.set_postfix(logs)
-            # progress_bar.set_postfix(loss=loss.item()) 
             global_step += 1
             
             if global_step % args.max_iter == 0:
@@ -225,7 +223,7 @@ def parse_args():
     parser.add_argument("--train_batch_size", type=int, default=12, help="Training batch size")
     parser.add_argument("--num_train_epochs", type=int, default=100, help="Number of training epochs")
     parser.add_argument("--num_epoch_eval", type=int, default=1, help="Number of epochs to evaluate")
-    parser.add_argument("--gradient_accumulation_steps", type=int, default=2, help="Gradient accumulation steps")
+    parser.add_argument("--gradient_accumulation_steps", type=int, default=1, help="Gradient accumulation steps")
     parser.add_argument("--use_8bit_adam", type=int, default=None, help="Use 8-bit Adam optimizer")
     parser.add_argument("--learning_rate", type=float, default=0.00001, help="Learning rate")
     parser.add_argument("--max_lr", type=float, default=0.00003, help="Maximum learning rate")
