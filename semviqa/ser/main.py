@@ -139,6 +139,7 @@ def main(args):
                 lr_scheduler.step()
 
             train_loss += loss.item()
+            train_loss /= args.gradient_accumulation_steps
             progress_bar.set_postfix(loss=loss.item())
             progress_bar.update(1)
             global_step += 1
