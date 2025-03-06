@@ -36,7 +36,6 @@ def load_models(args):
         beta=args.beta
     )
     
-    # model = QATCForQuestionAnswering.from_pretrained(args.model_name, config=config)
     model = QATCForQuestionAnswering(config)
     
     if args.is_load_weight:
@@ -94,11 +93,16 @@ def main(args):
         test_dataset, collate_fn=default_data_collator, batch_size=args.train_batch_size
     )
 
-    optimizer, train_dataloader = accelerator.prepare(optimizer, train_dataloader)
+    lr_scheduler = torch.optim.lr_scheduler.CyclicLR(optimizer, base_lr=args.learning_rate, max_lr=args.max_lr, cycle_momentum=False)
+
+    if args.is_load_weight: 
+        print("loading scheduler weight")
+        lr_scheduler.load_state_dict(torch.load(args.weight_scheduler))
+
+    optimizer, train_dataloader, lr_scheduler = accelerator.prepare(optimizer, train_dataloader, lr_scheduler)
 
     progress_bar = tqdm(desc="Steps", disable=not accelerator.is_local_main_process)
-
-    min_loss = float("inf")
+ 
     best_acc = 0.0
 
     print("Starting training...")
@@ -112,7 +116,7 @@ def main(args):
         for step, batch in enumerate(train_dataloader):
             for key in batch:
                 batch[key] = batch[key].to(accelerator.device)
-
+            batch['Tagging'] = batch['Tagging'].to(torch.float32)
             output = model(
                 input_ids=batch['input_ids'], 
                 attention_mask=batch['attention_mask'], 
@@ -124,13 +128,27 @@ def main(args):
             loss = output.loss
             accelerator.backward(loss)
 
-            optimizer.step()
-            optimizer.zero_grad()
+            if accelerator.sync_gradients:
+                accelerator.clip_grad_norm_(model.parameters(), args.max_grad_norm)
+                
+            if global_step % args.gradient_accumulation_steps == 0:
+                optimizer.step()
+                optimizer.zero_grad()
+                lr_scheduler.step()
 
             train_loss += loss.item()
             progress_bar.set_postfix(loss=loss.item())
             progress_bar.update(1)
             global_step += 1
+            
+            if global_step % args.max_iter == 0:
+                train_loss = round(train_loss / args.max_iter, 4)
+
+                print({
+                        'global_step': global_step,
+                        'Train loss': train_loss, 
+                        "epoch": epoch,
+                    })
 
         train_loss /= len(train_dataloader)
         print(f"Epoch {epoch+1} - Train Loss: {train_loss}")
@@ -142,11 +160,14 @@ def main(args):
         for step, batch in enumerate(eval_dataloader):
             with torch.no_grad():
                 for key in batch:
-                    batch[key] = batch[key].to("cuda")
-                
+                    batch[key] = batch[key].to(accelerator.device)
+                batch['Tagging'] = batch['Tagging'].to(torch.float32)
                 output = model(
                     input_ids=batch['input_ids'], 
-                    attention_mask=batch['attention_mask']
+                    attention_mask=batch['attention_mask'],
+                    start_positions=batch['start_positions'],
+                    end_positions=batch['end_positions'],
+                    tagging_labels=batch['Tagging']
                 )
 
                 loss = output.loss
@@ -183,16 +204,7 @@ def main(args):
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Evaluate VNFASHIONDIFF")
-    
-    # W&B related arguments
-    parser.add_argument("--key_wandb", type=str, default="", help="Wandb API Key")
-    parser.add_argument("--project", type=str, default="Find-Evidence-Retrieval", help="Wandb project name")
-    parser.add_argument("--tags", type=str, default="Full-Data", help="Wandb tags")
-    parser.add_argument("--name", type=str, default="Find-Evidence", help="Wandb run name")
-    
-    # Model and training related arguments
-    parser.add_argument("--model_name", type=str, default="/kaggle/input/model-base", help="Path to the base model")
-    parser.add_argument("--path_finetune_model", type=int, default=0, help="Path to fine-tuned model")
+    parser.add_argument("--model_name", type=str, default="/kaggle/input/model-base", help="Path to the base model") 
     parser.add_argument("--output_dir", type=str, default="/kaggle/working/", help="Output directory")
     parser.add_argument("--seed", type=int, default=40, help="Random seed")
     parser.add_argument("--logging_dir", type=str, default="logs", help="Logging directory")
@@ -210,11 +222,6 @@ def parse_args():
     parser.add_argument("--train_data", type=str, default='train.csv', help="Path to training data")
     parser.add_argument("--eval_data", type=str, default='test.csv', help="Path to evaluation data")
     
-    # Mixture of Experts (MoE) related arguments
-    parser.add_argument("--use_smoe", type=int, default=0, help="Use SMOE instead of MOE")
-    parser.add_argument("--num_experts", type=int, default=4, help="Number of experts in MoE")
-    parser.add_argument("--num_experts_per_token", type=int, default=2, help="Number of experts per token in MoE")
-
     # Others
     parser.add_argument("--freeze_text_encoder", type=int, default=0, help="Whether to freeze the text encoder")
     parser.add_argument("--beta", type=float, default=0.1, help="Beta value for MoE")
@@ -225,11 +232,8 @@ def parse_args():
     parser.add_argument("--weight_optimizer", type=str, default="/kaggle/input/weight-QACT/optimizer.bin", help="Path to optimizer weights")
     parser.add_argument("--weight_scheduler", type=str, default="/kaggle/input/weight-QACT/scheduler.bin", help="Path to scheduler weights")
     parser.add_argument("--max_iter", type=int, default=100, help="Maximum number of iterations")
-    parser.add_argument("--show_loss", type=int, default=1, help="Whether to display loss during training")
     parser.add_argument("--is_train", type=int, default=1, help="Set to True if training")
     parser.add_argument("--is_eval", type=int, default=1, help="Set to Eval")
-    parser.add_argument("--stop_threshold", type=float, default=0.0005, help="Stop threshold")
-
     parser.add_argument("--patience", type=int, default=5, help="Patience for early stopping")
     args = parser.parse_args()
     return args
