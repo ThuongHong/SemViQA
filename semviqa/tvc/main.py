@@ -48,10 +48,7 @@ def main(args):
     output_dir = args.output_dir
     os.makedirs(output_dir, exist_ok=True)
  
-    if 'infoxlm' in args.model_name or 'xlm-roberta' in args.model_name:
-        tokenizer = XLMRobertaTokenizerFast.from_pretrained(args.model_name)
-    else:
-        tokenizer = AutoTokenizer.from_pretrained(args.model_name)
+    tokenizer = AutoTokenizer.from_pretrained(args.model_name)
 
     config = ClaimVerificationConfig(
         model_name=args.model_name,
@@ -159,8 +156,10 @@ def main(args):
 
         if dev_f1 > best_acc:
             cnt = 0
-            torch.save(model.state_dict(), os.path.join(output_dir, 'best_model.pth'))
-            print(f'Saved best_model.pth at epoch {epoch+1}')
+            tokenizer.save_pretrained(output_dir)
+            model.save_pretrained(output_dir)
+            config.save_pretrained(output_dir)
+            print(f'Saved best_model at epoch {epoch+1}')
             best_acc = dev_f1
         else:
             cnt += 1
