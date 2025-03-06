@@ -14,6 +14,7 @@ from torch.utils.data import DataLoader
 import argparse
 import time
 from safetensors.torch import load_model
+from transformers import AutoTokenizer
 
 from qatc_model import QATCConfig, QATCForQuestionAnswering
 from data_utils import load_data
@@ -46,7 +47,7 @@ def load_models(args):
             model.load_state_dict(torch.load(args.weight_model), strict=False)
     
     count_parameters(model)
-    return model
+    return model, config
 
 def setting_optimizer(config, model):
     optimizer_cls = torch.optim.AdamW
@@ -79,11 +80,12 @@ def main(args):
     if accelerator.is_main_process and args.output_dir is not None:
         os.makedirs(args.output_dir, exist_ok=True)
 
-    model = load_models(args)
+    model, config = load_models(args)
     model = accelerator.prepare(model)
+    tokenizer = AutoTokenizer.from_pretrained(args.model_name)
 
     optimizer = setting_optimizer(args, model)
-    train_dataset, test_dataset = load_data(args)
+    train_dataset, test_dataset = load_data(args, tokenizer)
     
     train_dataloader = DataLoader(
         train_dataset, shuffle=True, collate_fn=default_data_collator, batch_size=args.train_batch_size
@@ -148,7 +150,8 @@ def main(args):
                         'global_step': global_step,
                         'Train loss': train_loss, 
                         "epoch": epoch,
-                    })
+                    }) 
+                train_loss = 0.0
 
         train_loss /= len(train_dataloader)
         print(f"Epoch {epoch+1} - Train Loss: {train_loss}")
@@ -190,7 +193,12 @@ def main(args):
             save_path = os.path.join(args.output_dir, f"best {args.name}")
             if not os.path.exists(save_path):
                 os.makedirs(save_path)
-            accelerator.save_state(save_path)
+            # accelerator.save_state(save_path)
+            model.save_pretrained(save_path)
+            torch.save(optimizer.state_dict(), os.path.join(save_path, "optimizer.bin"))
+            torch.save(lr_scheduler.state_dict(), os.path.join(save_path, "scheduler.bin"))
+            tokenizer.save_pretrained(save_path)
+            config.save_pretrained(save_path)
             best_acc = accuracy
             print("Save model best acc at epoch", epoch)
             cnt = 0
@@ -204,6 +212,7 @@ def main(args):
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Evaluate VNFASHIONDIFF")
+    parser.add_argument("--name", type=str, default="QATC", help="Name of the model")
     parser.add_argument("--model_name", type=str, default="/kaggle/input/model-base", help="Path to the base model") 
     parser.add_argument("--output_dir", type=str, default="/kaggle/working/", help="Output directory")
     parser.add_argument("--seed", type=int, default=40, help="Random seed")

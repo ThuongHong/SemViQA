@@ -1,4 +1,3 @@
-from transformers import AutoTokenizer, RobertaTokenizerFast
 import pandas as pd
 from datasets import Dataset
 
@@ -73,8 +72,7 @@ def preprocess_training_dataset(examples, tokenizer, config):
     return inputs
 
 
-def load_data(config):  
-    tokenizer = AutoTokenizer.from_pretrained(config.model_name)
+def load_data(config, tokenizer):   
     train_dataset = None
     test_dataset = None
     
