@@ -138,7 +138,8 @@ def main(args):
                 optimizer.zero_grad()
                 lr_scheduler.step()
 
-            train_loss += loss.item()
+            avg_loss = accelerator.gather(loss.repeat(args.train_batch_size)).mean()
+            train_loss += avg_loss.item() / args.gradient_accumulation_steps
             # train_loss /= args.gradient_accumulation_steps
             logs = {"step": f"{step}/{len(train_dataloader)}", "step_loss": loss.detach().item(), "lr": lr_scheduler.get_last_lr()[0]}
             progress_bar.set_postfix(logs)
