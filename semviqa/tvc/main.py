@@ -1,7 +1,7 @@
 import torch
 import pandas as pd
 from torch.utils.data import DataLoader
-from transformers import AutoTokenizer, XLMRobertaTokenizerFast, XLMRobertaTokenizer
+from transformers import AutoTokenizer, XLMRobertaTokenizerFast
 from torch.optim import AdamW
 from transformers import get_linear_schedule_with_warmup
 import torch.nn as nn
@@ -10,14 +10,12 @@ from sklearn.metrics import f1_score, accuracy_score, classification_report, pre
 from sklearn.utils.class_weight import compute_class_weight
 import numpy as np
 from tqdm import tqdm
-import matplotlib.pyplot as plt
 import os
 import time
 import multiprocessing
 
 from data_utils import Data
-from model import ClaimVerification
-from loss import focal_loss, FocalLoss
+from model import ClaimVerificationConfig, ClaimVerificationModel
 
 multiprocessing.set_start_method('spawn', force=True)
 
@@ -54,7 +52,14 @@ def main(args):
         tokenizer = XLMRobertaTokenizerFast.from_pretrained(args.model_name)
     else:
         tokenizer = AutoTokenizer.from_pretrained(args.model_name)
-    model = ClaimVerification(n_classes=args.n_classes, name_model=args.model_name).to(device)
+
+    config = ClaimVerificationConfig(
+        model_name=args.model_name,
+        num_labels=args.n_classes,
+        dropout=args.dropout_prob,
+        loss_type=args.type_loss
+    )
+    model = ClaimVerificationModel(config).to(device)
     count_parameters(model)
 
     train_dataset = Data(train_data, tokenizer, args, max_len=args.max_len)
@@ -63,15 +68,6 @@ def main(args):
     train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers)
     dev_loader = DataLoader(dev_dataset, batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers)
 
-    class_weights = compute_class_weight('balanced', classes=np.unique(train_data['verdict']), y=train_data['verdict'])
-    weights = torch.tensor(class_weights, dtype=torch.float32).to(device) if args.is_weighted else None
-
-    if args.type_loss == "cross_entropy":
-        criterion = nn.CrossEntropyLoss(weight=weights)
-    else:
-        criterion = FocalLoss(alpha= 0.25)
-
-
     optimizer = AdamW(model.parameters(), lr=args.lr)
 
     lr_scheduler = get_linear_schedule_with_warmup(
@@ -79,11 +75,9 @@ def main(args):
                 num_warmup_steps=0, 
                 num_training_steps=len(train_loader)*args.epochs
             )
-    
-    # info_epoch = pd.DataFrame(columns=["time_train", "epoch", "train_loss", "train_acc",  "f1-train", "time_val", "val_acc","val_loss", "f1-val"])
+
     info_epoch = {}
     logs = []
-
     best_acc = 0
     cnt = 0
 
@@ -99,42 +93,31 @@ def main(args):
         train_losses = []
         true_labels = []
         predicted_labels = []
-        i = 0
+
         for data in tqdm(train_loader):
             y_true = data['targets'].to(device)
-            targets = F.one_hot(data['targets'], args.n_classes)
             input_ids = data['input_ids'].to(device)
             attention_mask = data['attention_masks'].to(device)
-            targets = targets.to(device, dtype=torch.float)
 
-            outputs = model(
-                input_ids=input_ids,
-                attention_mask=attention_mask
-            ) 
-            loss = criterion(outputs, targets)
-            loss = loss / args.accumulation_steps
-            _, pred = torch.max(outputs, dim=1)
-
-            true_labels.extend(y_true.cpu().numpy())
-            predicted_labels.extend(pred.cpu().numpy()) 
+            outputs = model(input_ids=input_ids, attention_mask=attention_mask, labels=y_true)
+            loss = outputs["loss"]
+            logits = outputs["logits"] 
             train_losses.append(loss.item())
-            loss.backward()
-            if (i + 1) % args.accumulation_steps == 0:
-                optimizer.step()
-                lr_scheduler.step() 
-                optimizer.zero_grad()
-                nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
 
-            i += 1
+            loss.backward()
+            optimizer.step()
+            lr_scheduler.step() 
+            optimizer.zero_grad()
+
+            _, pred = torch.max(logits, dim=1)
+            true_labels.extend(y_true.cpu().numpy())
+            predicted_labels.extend(pred.cpu().numpy())
 
         train_f1 = f1_score(true_labels, predicted_labels, average='macro')
         train_acc = accuracy_score(true_labels, predicted_labels)
         epoch_training_time = time.time() - start_training_time
-        info_train = f'Training time: {epoch_training_time:.2f}s Train Loss: {np.mean(train_losses):.4f} F1: {train_f1:.4f} Acc: {train_acc:.4f}'
-        print(info_train)
-        logs.append(info_train)
+        print(f'Training time: {epoch_training_time:.2f}s Train Loss: {np.mean(train_losses):.4f} F1: {train_f1:.4f} Acc: {train_acc:.4f}')
 
-        # Evaluation
         model.eval()
         eval_losses = []
         y_true_list = []
@@ -144,48 +127,23 @@ def main(args):
         with torch.no_grad():
             for data in tqdm(dev_loader):
                 y_true = data['targets'].to(device)
-                targets = F.one_hot(data['targets'], args.n_classes)
-
                 input_ids = data['input_ids'].to(device)
                 attention_mask = data['attention_masks'].to(device)
-                targets = targets.to(device, dtype=torch.float)
 
-                outputs = model(
-                    input_ids=input_ids,
-                    attention_mask=attention_mask
-                ) 
-
-                _, pred = torch.max(outputs, dim=1)
-
-                loss = criterion(outputs, targets)
+                outputs = model(input_ids=input_ids, attention_mask=attention_mask, labels=y_true)
+                loss = outputs["loss"]
+                logits = outputs["logits"]
                 eval_losses.append(loss.item())
 
+                _, pred = torch.max(logits, dim=1)
                 y_true_list.extend(y_true.cpu().numpy())
                 y_pred_list.extend(pred.cpu().numpy())
 
-        # Evaluation metrics
         dev_f1 = f1_score(y_true_list, y_pred_list, average='macro')
         dev_acc = accuracy_score(y_true_list, y_pred_list)
-        dev_precision = precision_score(y_true_list, y_pred_list, average='macro')
-        dev_recall = recall_score(y_true_list, y_pred_list, average='macro')
-        dev_cohen_kappa = cohen_kappa_score(y_true_list, y_pred_list)
-        dev_matthews_corrcoef = matthews_corrcoef(y_true_list, y_pred_list)
-        dev_confusion_matrix = confusion_matrix(y_true_list, y_pred_list) 
-        try:
-            dev_roc_auc = roc_auc_score(y_true_list, torch.nn.functional.one_hot(torch.tensor(y_pred_list), num_classes=len(set(y_true_list))).numpy(), multi_class="ovr")
-        except ValueError:
-            dev_roc_auc = "N/A"
         epoch_eval_time = time.time() - start_eval_time
 
-        clss_report = classification_report(y_true_list, y_pred_list, digits=4)
-        info_eval = f'Dev time: {epoch_eval_time}s Dev Loss: {np.mean(eval_losses):.4f} F1: {dev_f1:.4f} Acc: {dev_acc:.4f} Precision: {dev_precision:.4f} Recall: {dev_recall:.4f} Cohen Kappa: {dev_cohen_kappa:.4f} Matthews Corrcoef: {dev_matthews_corrcoef:.4f} ROC AUC: {dev_roc_auc}'
-        print(dev_confusion_matrix)
-        print(info_eval)
-        print(clss_report)
-        logs.append(info_eval)
-        logs.append(str(clss_report))
-        logs.append(str(dev_confusion_matrix))
-
+        print(f'Dev time: {epoch_eval_time}s Dev Loss: {np.mean(eval_losses):.4f} F1: {dev_f1:.4f} Acc: {dev_acc:.4f}')
 
         info_epoch[epoch] = {
             "time_train": epoch_training_time,
@@ -196,43 +154,25 @@ def main(args):
             "time_val": epoch_eval_time,
             "val_acc": dev_acc,
             "val_loss": np.mean(eval_losses),
-            "f1-val": dev_f1,
-            "precision": dev_precision,
-            "recall": dev_recall,
-            "cohen_kappa": dev_cohen_kappa,
-            "matthews_corrcoef": dev_matthews_corrcoef,
-            "roc_auc": dev_roc_auc
+            "f1-val": dev_f1
         }
-        # Save logs
-        with open(os.path.join(output_dir, 'logs.txt'), 'w') as f:
-            f.write(f'Epoch {epoch+1}/{args.epochs}\n')
-            for log in logs:
-                f.write(f'{log}\n')
-            f.write('\n')
 
         if dev_f1 > best_acc:
             cnt = 0
-            # torch.save(model, os.path.join(output_dir, 'full_model.pth'))
-            torch.save(model.state_dict(), os.path.join(output_dir, 'best_acc.pth'))
-            print(f'save best_acc.pth with epoch {epoch+1}')
+            torch.save(model.state_dict(), os.path.join(output_dir, 'best_model.pth'))
+            print(f'Saved best_model.pth at epoch {epoch+1}')
             best_acc = dev_f1
         else:
-            cnt+=1
+            cnt += 1
 
         if cnt >= args.patience:
-            print('Stop model') 
+            print('Early stopping')
             break
 
         torch.cuda.empty_cache()
 
-    print('Finish training')
-    print(f'Total time: {time.time() - total_time:.2f}s')
-
-    info_epoch = pd.DataFrame(info_epoch).T
-    info_epoch.to_csv(os.path.join(output_dir, 'info_epoch.csv'), index=False)
-    
-
-
+    print(f'Total training time: {time.time() - total_time:.2f}s')
+    pd.DataFrame(info_epoch).T.to_csv(os.path.join(output_dir, 'info_epoch.csv'), index=False)
 
 def parse_args():
     import argparse
@@ -242,7 +182,6 @@ def parse_args():
     parser.add_argument('--model_name', type=str, default='MoritzLaurer/ernie-m-large-mnli-xnli')
     parser.add_argument('--lr', type=float, default=1e-5)
     parser.add_argument('--epochs', type=int, default=10)
-    parser.add_argument('--accumulation_steps', type=int, default=16)
     parser.add_argument('--batch_size', type=int, default=8)
     parser.add_argument('--max_len', type=int, default=256)
     parser.add_argument('--num_workers', type=int, default=2)
