@@ -140,8 +140,9 @@ def main(args):
 
             train_loss += loss.item()
             # train_loss /= args.gradient_accumulation_steps
-            progress_bar.set_postfix(loss=loss.item())
-            progress_bar.update(1)
+            logs = {"step": f"{step}/{len(train_dataloader)}", "step_loss": loss.detach().item(), "lr": lr_scheduler.get_last_lr()[0]}
+            progress_bar.set_postfix(logs)
+            # progress_bar.set_postfix(loss=loss.item()) 
             global_step += 1
             
             if global_step % args.max_iter == 0:
@@ -184,6 +185,8 @@ def main(args):
 
                 predictions.extend(list(zip(start_preds, end_preds)))
                 true_positions.extend(list(zip(start_true, end_true)))
+            
+            progress_bar.update(1)
 
         eval_loss /= len(eval_dataloader)
         accuracy = np.mean([p == t for p, t in zip(predictions, true_positions)])
