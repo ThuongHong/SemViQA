@@ -2,7 +2,7 @@
 import torch
 from torch.utils.data import Dataset
 class Data(Dataset):
-    def __init__(self, df, tokenizer, config, max_len=400):
+    def __init__(self, df, tokenizer, config, max_len=256):
         self.df = df
         self.max_len = max_len
         self.tokenizer = tokenizer
