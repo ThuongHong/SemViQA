@@ -77,6 +77,7 @@ def main(args):
     logs = []
     best_acc = 0
     cnt = 0
+    i = 0
 
     total_time = time.time()
     for epoch in range(args.epochs):
@@ -102,9 +103,12 @@ def main(args):
             train_losses.append(loss.item())
 
             loss.backward()
-            optimizer.step()
-            lr_scheduler.step() 
-            optimizer.zero_grad()
+            if (i + 1) % args.accumulation_steps == 0:
+                optimizer.step()
+                lr_scheduler.step() 
+                optimizer.zero_grad()
+                nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+            i += 1
 
             _, pred = torch.max(logits, dim=1)
             true_labels.extend(y_true.cpu().numpy())
@@ -190,6 +194,7 @@ def parse_args():
     parser.add_argument('--n_classes', type=int, default=3)
     parser.add_argument('--is_weighted', type=int, default=0)
     parser.add_argument('--dropout_prob', type=float, default=0.3)
+    parser.add_argument('--accumulation_steps', type=int, default=1)
     return parser.parse_args()
 
 if __name__ == '__main__':
