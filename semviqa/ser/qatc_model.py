@@ -1,9 +1,9 @@
-from transformers import PreTrainedModel, AutoModel, PretrainedConfig
+from transformers import PreTrainedModel, AutoModel, PretrainedConfig, RobertaModel, XLMRobertaModel
 from transformers.modeling_outputs import QuestionAnsweringModelOutput
 import torch
 import torch.nn.functional as F
 import torch.nn as nn
-from loss import comboLoss  
+from .loss import comboLoss  
 
 class QATCConfig(PretrainedConfig):
     model_type = "qatc"
@@ -42,7 +42,12 @@ class QATCForQuestionAnswering(PreTrainedModel):
     def __init__(self, config):
         super(QATCForQuestionAnswering, self).__init__(config)
         self.config = config
-        self.model = AutoModel.from_pretrained(config.model_name)
+        if "deberta" in self.config.model_name:
+            self.model = AutoModel.from_pretrained(self.config.model_name) 
+        elif "info" in self.config.model_name:
+            self.model = XLMRobertaModel.from_pretrained(self.config.model_name)
+        else:
+            self.model = RobertaModel.from_pretrained(self.config.model_name)
 
         if getattr(self.config, "freeze_text_encoder", False):
             print("Freezing text encoder weights")
@@ -60,6 +65,7 @@ class QATCForQuestionAnswering(PreTrainedModel):
         self.tagging = Rational_Tagging(self.model.config.hidden_size)
         self.loss_fn = comboLoss(config)
         self.init_weights()
+        self.model.pooler = None
 
     def forward(
         self,
@@ -110,7 +116,10 @@ class QATCForQuestionAnswering(PreTrainedModel):
             "pt": rational_tag_logits
         }
 
-        total_loss = self.loss_fn(loss_inputs)
+        if start_logits == None and end_logits == None and tagging_labels == None:
+            total_loss = self.loss_fn(loss_inputs)
+        else:
+            total_loss = None
 
         if not return_dict:
             return (total_loss, start_logits, end_logits, rational_tag_logits) + outputs[2:]

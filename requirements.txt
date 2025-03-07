@@ -2,7 +2,7 @@ transformers==4.42.3
 datasets==2.20.0
 pandas==2.2.2
 numpy==1.26.4
-# torch==2.1.2
+underthesea==6.8.4
 gc-python-utils==0.0.1
 tqdm==4.66.4
 safetensors==0.4.3
@@ -10,10 +10,8 @@ sentence-transformers==3.0.1
 scikit-learn==1.2.2
 matplotlib==3.7.5
 accelerate==0.32.1
-wandb==0.17.4
-omegaconf==2.3.0
-huggingface-hub==0.27.1 
+omegaconf==2.3.0 
 einops==0.8.0
-rank_bm25==0.2.2
-peft==0.14.0
+rank_bm25==0.2.2 
 sentencepiece==0.2.0
+pyvi==0.1.1

@@ -1,9 +1,9 @@
 from transformers import PreTrainedModel, AutoModel, PretrainedConfig
 import torch
 import torch.nn as nn
-from loss import FocalLoss
+from .loss import FocalLoss
 
-class ClaimVerificationConfig(PretrainedConfig):
+class ClaimModelConfig(PretrainedConfig):
     model_type = "claim_verification"
 
     def __init__(
@@ -20,8 +20,8 @@ class ClaimVerificationConfig(PretrainedConfig):
         self.dropout = dropout
         self.loss_type = loss_type
 
-class ClaimVerificationModel(PreTrainedModel):
-    config_class = ClaimVerificationConfig
+class ClaimModelForClassification(PreTrainedModel):
+    config_class = ClaimModelConfig
     base_model_prefix = "claim_verification"
 
     def __init__(self, config):
@@ -29,7 +29,7 @@ class ClaimVerificationModel(PreTrainedModel):
         self.config = config
         self.bert = AutoModel.from_pretrained(config.model_name)
         self.dropout = nn.Dropout(p=config.dropout)
-        self.classifier = nn.Linear(self.bert.config.hidden_size, config.num_labels)
+        self.fc = nn.Linear(self.bert.config.hidden_size, config.num_labels)
 
         if self.config.loss_type == 'focal':
             self.loss_fn = FocalLoss()
@@ -57,9 +57,9 @@ class ClaimVerificationModel(PreTrainedModel):
             **kwargs
         )
 
-        cls_output = outputs.last_hidden_state[:, 0, :]  
+        cls_output = outputs[1]  
         x = self.dropout(cls_output)
-        logits = self.classifier(x)
+        logits = self.fc(x)
         
         if labels is not None:
             loss = self.loss_fn(logits, labels)
