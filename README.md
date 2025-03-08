@@ -12,11 +12,11 @@
   <a href="https://arxiv.org/abs/2503.00955">
     <img src="https://img.shields.io/badge/arXiv-2411.00918-red?style=flat&label=arXiv">
   </a>
-  <a href="https://huggingface.co/your-model">
+  <a href="https://huggingface.co/SemViQA">
     <img src="https://img.shields.io/badge/Hugging%20Face-Model-yellow?style=flat">
   </a>
-  <a href="https://pypi.org/project/your-package">
-    <img src="https://img.shields.io/pypi/v/your-package?color=blue&label=PyPI">
+  <a href="https://pypi.org/project/SemViQA">
+    <img src="https://img.shields.io/pypi/v/SemViQA?color=blue&label=PyPI">
   </a>
 </p>
 
