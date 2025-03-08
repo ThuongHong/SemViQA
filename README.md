@@ -58,56 +58,56 @@ We are making our **SemViQA** experiment checkpoints publicly available to suppo
   <tr>
     <td rowspan="3"><strong>TC</strong></td>
     <td>InfoXLM<sub>large</sub></td>
-    <td><a href="https://huggingface.co/xuandin/semviqa-tc-infoxlm-viwikifc">Link</a></td>
-    <td><a href="https://huggingface.co/xuandin/semviqa-tc-infoxlm-isedsc01">Link</a></td>
+    <td><a href="https://huggingface.co/SemViQA/tc-infoxlm-viwikifc">Link</a></td>
+    <td><a href="https://huggingface.co/SemViQA/tc-infoxlm-isedsc01">Link</a></td>
   </tr>
   <tr>
     <td>XLM-R<sub>large</sub></td>
-    <td><a href="https://huggingface.co/xuandin/semviqa-tc-xlmr-viwikifc">Link</a></td>
-    <td><a href="https://huggingface.co/xuandin/semviqa-tc-xlmr-isedsc01">Link</a></td>
+    <td><a href="https://huggingface.co/SemViQA/tc-xlmr-viwikifc">Link</a></td>
+    <td><a href="https://huggingface.co/SemViQA/tc-xlmr-isedsc01">Link</a></td>
   </tr>
   <tr>
     <td>Ernie-M<sub>large</sub></td>
-    <td><a href="https://huggingface.co/xuandin/semviqa-tc-erniem-viwikifc">Link</a></td>
-    <td><a href="https://huggingface.co/xuandin/semviqa-tc-erniem-isedsc01">Link</a></td> 
+    <td><a href="https://huggingface.co/SemViQA/tc-erniem-viwikifc">Link</a></td>
+    <td><a href="https://huggingface.co/SemViQA/tc-erniem-isedsc01">Link</a></td> 
   </tr>
   <tr>
     <td rowspan="3"><strong>BC</strong></td>
     <td>InfoXLM<sub>large</sub></td>
-    <td><a href="https://huggingface.co/xuandin/semviqa-bc-infoxlm-viwikifc">Link</a></td>
-    <td><a href="https://huggingface.co/xuandin/semviqa-bc-infoxlm-isedsc01">Link</a></td>
+    <td><a href="https://huggingface.co/SemViQA/bc-infoxlm-viwikifc">Link</a></td>
+    <td><a href="https://huggingface.co/SemViQA/bc-infoxlm-isedsc01">Link</a></td>
   </tr>
   <tr>
     <td>XLM-R<sub>large</sub></td>
-    <td><a href="https://huggingface.co/xuandin/semviqa-bc-xlmr-viwikifc">Link</a></td>
-    <td><a href="https://huggingface.co/xuandin/semviqa-bc-xlmr-isedsc01">Link</a></td>
+    <td><a href="https://huggingface.co/SemViQA/bc-xlmr-viwikifc">Link</a></td>
+    <td><a href="https://huggingface.co/SemViQA/bc-xlmr-isedsc01">Link</a></td>
   </tr>
   <tr>
     <td>Ernie-M<sub>large</sub></td>
-    <td><a href="https://huggingface.co/xuandin/semviqa-bc-erniem-viwikifc">Link</a></td>
-    <td><a href="https://huggingface.co/xuandin/semviqa-bc-erniem-isedsc01">Link</a></td>
+    <td><a href="https://huggingface.co/SemViQA/bc-erniem-viwikifc">Link</a></td>
+    <td><a href="https://huggingface.co/SemViQA/bc-erniem-isedsc01">Link</a></td>
   </tr>
   <tr>
     <td rowspan="2"><strong>QATC</strong></td>
     <td>InfoXLM<sub>large</sub></td>
-    <td><a href="https://huggingface.co/xuandin/semviqa-qatc-infoxlm-viwikifc">Link</a></td>
-    <td><a href="https://huggingface.co/xuandin/semviqa-qatc-infoxlm-isedsc01">Link</a></td>
+    <td><a href="https://huggingface.co/SemViQA/qatc-infoxlm-viwikifc">Link</a></td>
+    <td><a href="https://huggingface.co/SemViQA/qatc-infoxlm-isedsc01">Link</a></td>
   </tr>
   <tr>
     <td>ViMRC<sub>large</sub></td>
-    <td><a href="https://huggingface.co/xuandin/semviqa-qatc-vimrc-viwikifc">Link</a></td>
-    <td><a href="https://huggingface.co/xuandin/semviqa-qatc-vimrc-isedsc01">Link</a></td>
+    <td><a href="https://huggingface.co/SemViQA/qatc-vimrc-viwikifc">Link</a></td>
+    <td><a href="https://huggingface.co/SemViQA/qatc-vimrc-isedsc01">Link</a></td>
   </tr>
   <tr>
     <td rowspan="2"><strong>QA origin</strong></td>
     <td>InfoXLM<sub>large</sub></td>
-    <td><a href="https://huggingface.co/xuandin/infoxlm-large-viwikifc">Link</a></td>
-    <td><a href="https://huggingface.co/xuandin/infoxlm-large-isedsc01">Link</a></td>
+    <td><a href="https://huggingface.co/SemViQA/infoxlm-large-viwikifc">Link</a></td>
+    <td><a href="https://huggingface.co/SemViQA/infoxlm-large-isedsc01">Link</a></td>
   </tr>
   <tr>
     <td>ViMRC<sub>large</sub></td>
-    <td><a href="https://huggingface.co/xuandin/vi-mrc-large-viwikifc">Link</a></td>
-    <td><a href="https://huggingface.co/xuandin/vi-mrc-large-isedsc01">Link</a></td>
+    <td><a href="https://huggingface.co/SemViQA/vi-mrc-large-viwikifc">Link</a></td>
+    <td><a href="https://huggingface.co/SemViQA/vi-mrc-large-isedsc01">Link</a></td>
   </tr>
 </table>
 

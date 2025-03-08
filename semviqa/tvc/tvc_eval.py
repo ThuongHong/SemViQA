@@ -39,7 +39,7 @@ def classify_claim(claim: str, context: str, model, tokenizer, device: torch.dev
     with torch.no_grad():
         outputs = model(input_ids=input_ids, attention_mask=attention_mask)
 
-    probabilities = F.softmax(outputs, dim=1)
+    probabilities = F.softmax(outputs["logits"], dim=1)
     prob, pred = torch.max(probabilities, dim=1)
 
     return prob, pred.item()

@@ -157,7 +157,7 @@ def mean_pooling(model_output, attention_mask):
     return torch.sum(token_embeddings * mask_expanded, dim=1) / torch.clamp(mask_expanded.sum(dim=1), min=1e-9)
 
 
-def extract_evidence_tfidf_qatc(claim, context, model_evidence_QA, tokenizer_QA, device, threshold=0.5, length_ratio_threshold=0.6, is_qatc_faster=False):
+def extract_evidence_tfidf_qatc(claim, context, model_evidence_QA, tokenizer_QA, device, confidence_threshold=0.5, length_ratio_threshold=0.6, is_qatc_faster=False):
     """
     Finds the most relevant evidence for a given claim in the context.
 
@@ -167,14 +167,14 @@ def extract_evidence_tfidf_qatc(claim, context, model_evidence_QA, tokenizer_QA,
         model_evidence_QA (torch.nn.Module): The QA model used for evidence extraction.
         tokenizer_QA: Tokenizer corresponding to the QA model.
         device (str): The device (CPU/GPU) to run the model on.
-        threshold (float): Similarity threshold for TF-IDF selection.
+        confidence_threshold (float): Similarity threshold for TF-IDF selection.
         is_qatc_faster (bool): Whether to use the faster QATC method.
 
     Returns:
         str: The best-matching evidence sentence.
     """
     evidence_tf = tfidf_topk(context, claim, top_k=1, threshold= length_ratio_threshold)[0]
-    if evidence_tf[0] > threshold:
+    if evidence_tf[0] > confidence_threshold:
         return evidence_tf[1]
 
     sentences = split_sentence(context)

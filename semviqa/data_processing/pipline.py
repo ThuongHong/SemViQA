@@ -19,6 +19,16 @@ def preprocess_text(text: str) -> str:
     text = " ".join(text.split())
     return text.lower()
 
+# def split_chill(t: str) -> list:
+#     return re.split(r'(?<=\.)\s*', t)
+ 
+# def split_sentence(paragraph: str) -> list:
+#     context_list = sent_tokenize(paragraph)
+#     updated_list = []
+#     for context in context_list:
+#         updated_list.extend(split_chill(context) if '. ' in context else [context])
+#     return updated_list
+
 def split_sentence(paragraph: str) -> list:
     """
     Splits a paragraph into sentences based on specific rules:
