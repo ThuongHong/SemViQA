@@ -182,7 +182,7 @@ Alternatively, you can use **SemViQA** programmatically:
 
 ```python
 # Install semviqa package
-pip install semviqa
+!pip install semviqa
 
 # Import the pipeline
 from semviqa.pipeline import SemViQA
