@@ -16,9 +16,9 @@ echo "Starting the inference process..."
 python3 semviqa/pipeline.py \
     --data_path "data/test.json" \
     --output_path "output.json" \
-    --model_evidence_QA "QATC" \
-    --model_2_class "2_class" \
-    --model_3_class "3_class" \
+    --model_evidence_QA "SemViQA/qatc-infoxlm-viwikifc" \
+    --model_2_class "SemViQA/bc-infoxlm-viwikifc" \
+    --model_3_class "SemViQA/tc-infoxlm-viwikifc" \
     --thres_evidence 0.5
  
 echo "Inference process completed!"

@@ -25,7 +25,7 @@ python3 semviqa/tvc/main.py \
     --max_len 256 \
     --num_workers 2 \
     --patience 5 \
-    --type_loss "focal" \
+    --type_loss "ce" \
     --output_dir "./xlm-roberta-large_viwiki_2class_focal" \
     --n_classes 3\
 

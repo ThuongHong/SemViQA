@@ -168,18 +168,58 @@ pip install -r requirements.txt
 Train different components of **SemViQA** using the provided scripts:  
 
 ### **1️⃣ Three-Class Classification Training**  
+Train a three-class claim classification model using the following command:
 ```bash
 bash scripts/tc.sh
 ```
+If you want to fine-tune the model using pre-trained weights, you can initialize it as follows:
+```python
+# Install semviqa
+!pip install semviqa
+
+# Initalize a pipeline
+from transformers import AutoTokenizer
+from semviqa.tvc.model import ClaimModelForClassification
+
+tokenizer = AutoTokenizer.from_pretrained("SemViQA/tc-infoxlm-viwikifc")
+model = ClaimModelForClassification.from_pretrained("SemViQA/tc-infoxlm-viwikifc", num_labels=3)
+```
 
 ### **2️⃣ Binary Classification Training**  
+Train a binary classification model using the command below:
 ```bash
 bash scripts/bc.sh
 ```
+To fine-tune the model with existing weights, use the following setup:
+```python
+# Install semviqa
+!pip install semviqa
+
+# Initalize a pipeline
+from transformers import AutoTokenizer
+from semviqa.tvc.model import ClaimModelForClassification
+
+tokenizer = AutoTokenizer.from_pretrained("SemViQA/bc-infoxlm-viwikifc")
+model = ClaimModelForClassification.from_pretrained("SemViQA/bc-infoxlm-viwikifc", num_labels=2)
+```
 
 ### **3️⃣ QATC Model Training**  
+Train the Question Answering Token Classifier (QATC) model using the following command:
 ```bash
 bash scripts/qatc.sh
+```
+
+To continue training from pre-trained weights, use this setup:
+```python
+# Install semviqa
+!pip install semviqa
+
+# Initalize a pipeline
+from transformers import AutoTokenizer
+from semviqa.ser.qatc_model import QATCForQuestionAnswering
+
+tokenizer = AutoTokenizer.from_pretrained("SemViQA/qatc-infoxlm-viwikifc")
+model = QATCForQuestionAnswering.from_pretrained("SemViQA/qatc-infoxlm-viwikifc")
 ```
 
 ---
