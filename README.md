@@ -18,7 +18,11 @@
   <a href="https://pypi.org/project/SemViQA">
     <img src="https://img.shields.io/pypi/v/SemViQA?color=blue&label=PyPI">
   </a>
+  <a href="https://github.com/DAVID-NGUYEN-S16/SemViQA">
+    <img src="https://img.shields.io/github/stars/DAVID-NGUYEN-S16/SemViQA?style=social">
+  </a>
 </p>
+
 
 <p align="center">
     <a href="#-about">📌 About</a> •
