@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="semviqa",
-    version="1.0.6",
+    version="1.0.7",
     packages=find_packages(),
     install_requires=[
         "transformers==4.42.3",
@@ -26,7 +26,7 @@ setup(
     author="Nam V. Nguyen, Dien X. Tran, Thanh T. Tran, Anh T. Hoang, Tai V. Duong, Di T. Le, Phuc-Lu Le",
     author_email="xuandienk4@gmail.com",
     description="SemViQA: A Semantic Question Answering System for Vietnamese Fact-Checking",
-    long_description=open("description.md", encoding="utf-8").read(),
+    long_description=open("README.md", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
     url="https://github.com/DAVID-NGUYEN-S16/SemViQA",
     classifiers=[
