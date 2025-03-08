@@ -1,4 +1,11 @@
-# **SemViQA: A Semantic Question Answering System for Vietnamese Information Fact-Checking**  
+<p align="center">
+  <img alt="SemViQA Logo" src="image/logo.png" height="250" />
+  <p align="center">SemViQA: A Semantic Question Answering System for Vietnamese Information Fact-Checking
+    <br>
+  </p>
+</p>
+
+<!-- # **SemViQA: A Semantic Question Answering System for Vietnamese Information Fact-Checking**   -->
 
 ### **Authors**:  
 [**Nam V. Nguyen**](https://github.com/DAVID-NGUYEN-S16), [**Dien X. Tran**](https://github.com/xndien2004), Thanh T. Tran, Anh T. Hoang, Tai V. Duong, Di T. Le, Phuc-Lu Le 
@@ -6,7 +13,14 @@
   <a href="https://arxiv.org/abs/2503.00955">
     <img src="https://img.shields.io/badge/arXiv-2411.00918-red?style=flat&label=arXiv">
   </a>
+  <a href="https://huggingface.co/your-model">
+    <img src="https://img.shields.io/badge/Hugging%20Face-Model-yellow?style=flat">
+  </a>
+  <a href="https://pypi.org/project/your-package">
+    <img src="https://img.shields.io/pypi/v/your-package?color=blue&label=PyPI">
+  </a>
 </p>
+
 <p align="center">
     <a href="#-about">📌 About</a> •
     <a href="#-checkpoints">🔍 Checkpoints</a> •
