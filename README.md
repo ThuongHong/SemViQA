@@ -29,7 +29,7 @@
     <a href="#-checkpoints">🔍 Checkpoints</a> •
     <a href="#-quick-start">🚀 Quick Start</a> •
     <a href="#-training">🏋️‍♂️ Training</a> •
-    <a href="#-pipeline">🧪 Pipeline</a> •
+    <a href="#-evaluation">📊 Evaluation</a> •
     <a href="#-citation">📖 Citation</a>
 </p>  
 
@@ -228,8 +228,71 @@ model = QATCForQuestionAnswering.from_pretrained("SemViQA/qatc-infoxlm-viwikifc"
 
 ---
 
-## 🧪 **Pipeline**  
+## 📊 **Evaluation**
 
+### **1️⃣ Semantic-based Evidence Retrieval**
+This module extracts the most relevant evidence from a given context based on a claim. It leverages TF-IDF combined with the QATC model to ensure accurate retrieval.
+```python
+# Install semviqa package
+!pip install semviqa
+
+# Import the ser module
+import torch
+from transformers import AutoTokenizer
+from semviqa.ser.qatc_model import QATCForQuestionAnswering
+from semviqa.ser.ser_eval import extract_evidence_tfidf_qatc
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+tokenizer = AutoTokenizer.from_pretrained("SemViQA/qatc-infoxlm-viwikifc")
+model = QATCForQuestionAnswering.from_pretrained("SemViQA/qatc-infoxlm-viwikifc")
+
+claim = "Chiến tranh với Campuchia đã kết thúc trước khi Việt Nam thống nhất."
+context = "Sau khi thống nhất, Việt Nam tiếp tục gặp khó khăn do sự sụp đổ và tan rã của đồng minh Liên Xô cùng Khối phía Đông, các lệnh cấm vận của Hoa Kỳ, chiến tranh với Campuchia, biên giới giáp Trung Quốc và hậu quả của chính sách bao cấp sau nhiều năm áp dụng. Năm 1986, Đảng Cộng sản ban hành cải cách đổi mới, tạo điều kiện hình thành kinh tế thị trường và hội nhập sâu rộng. Cải cách đổi mới kết hợp cùng quy mô dân số lớn đưa Việt Nam trở thành một trong những nước đang phát triển có tốc độ tăng trưởng thuộc nhóm nhanh nhất thế giới, được coi là Hổ mới châu Á dù cho vẫn gặp phải những thách thức như tham nhũng, tội phạm gia tăng, ô nhiễm môi trường và phúc lợi xã hội chưa đầy đủ. Ngoài ra, giới bất đồng chính kiến, chính phủ một số nước phương Tây và các tổ chức theo dõi nhân quyền có quan điểm chỉ trích hồ sơ nhân quyền của Việt Nam liên quan đến các vấn đề tôn giáo, kiểm duyệt truyền thông, hạn chế hoạt động ủng hộ nhân quyền cùng các quyền tự do dân sự."
+
+evidence = extract_evidence_tfidf_qatc(
+    claim, context, model, tokenizer, device, confidence_threshold=0.5, length_ratio_threshold=0.6
+)
+
+print(evidence)
+# evidence: sau khi thống nhất việt nam tiếp tục gặp khó khăn do sự sụp đổ và tan rã của đồng minh liên xô cùng khối phía đông các lệnh cấm vận của hoa kỳ chiến tranh với campuchia biên giới giáp trung quốc và hậu quả của chính sách bao cấp sau nhiều năm áp dụng
+```
+
+
+### **2️⃣ Two-step Verdict Classification**
+This module performs claim classification using a **two-step approach**:
+1. **Three-class classification**: Determines if a claim is **Supported, Refuted, or Not Enough Information (NEI)**.
+2. **Binary classification** (if necessary): Further verifies if the claim is **Supported** or **Refuted**.
+```python
+# Install semviqa package
+!pip install semviqa
+
+# Import the tvc module
+import torch
+from semviqa.tvc.tvc_eval import classify_claim
+from semviqa.tvc.model import ClaimModelForClassification
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+tokenizer = AutoTokenizer.from_pretrained("SemViQA/tc-infoxlm-viwikifc")
+model_tc = ClaimModelForClassification.from_pretrained("SemViQA/tc-infoxlm-viwikifc", num_labels=3).to(device)
+model_bc = ClaimModelForClassification.from_pretrained("SemViQA/bc-infoxlm-viwikifc", num_labels=2).to(device)
+
+claim = "Chiến tranh với Campuchia đã kết thúc trước khi Việt Nam thống nhất."
+evidence = "Sau khi thống nhất, Việt Nam tiếp tục gặp khó khăn do sự sụp đổ và tan rã của đồng minh Liên Xô cùng Khối phía Đông, các lệnh cấm vận của Hoa Kỳ, chiến tranh với Campuchia, biên giới giáp Trung Quốc và hậu quả của chính sách bao cấp sau nhiều năm áp dụng."
+
+verdict = "NEI"
+prob3class, pred_3_class = classify_claim(claim, evidence, model_tc, tokenizer, device)
+
+if pred_3_class != 0:
+  prob2class, pred_2_class = classify_claim(claim, evidence, model_bc, tokenizer, device)
+  verdict = "SUPPORTED" if pred_2_class == 0 else "REFUTED" if prob2class > prob3class else ["NEI", "SUPPORTED", "REFUTED"][pred_3_class]
+
+print(verdict)
+# Output: REFUTED
+```
+
+### **3️⃣ Full Pipeline Evaluation**
 Use the trained models to **predict test data**:  
 ```bash
 bash scripts/pipeline.sh
