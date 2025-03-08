@@ -1,11 +1,10 @@
 <p align="center">
-  <img alt="SemViQA Logo" src="image/logo.png" height="250" />
-  <p align="center">SemViQA: A Semantic Question Answering System for Vietnamese Information Fact-Checking
+  <img alt="SemViQA Logo" src="image/logo.png" height="250" /> 
     <br>
   </p>
 </p>
 
-<!-- # **SemViQA: A Semantic Question Answering System for Vietnamese Information Fact-Checking**   -->
+# **SemViQA: A Semantic Question Answering System for Vietnamese Information Fact-Checking**  
 
 ### **Authors**:  
 [**Nam V. Nguyen**](https://github.com/DAVID-NGUYEN-S16), [**Dien X. Tran**](https://github.com/xndien2004), Thanh T. Tran, Anh T. Hoang, Tai V. Duong, Di T. Le, Phuc-Lu Le 
