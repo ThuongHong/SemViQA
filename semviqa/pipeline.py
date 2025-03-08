@@ -11,7 +11,7 @@ from .ser.qatc_model import QATCForQuestionAnswering
 from .tvc.tvc_eval import classify_claim
 from .tvc.model import ClaimModelForClassification
 
-class SemViQA:
+class SemViQAPipeline:
     def __init__(self, model_evidence_QA, model_bc, model_tc, thres_evidence=0.5, length_ratio_threshold=0.6, is_qatc_faster=False, device=None):
         self.device = device if device else torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.thres_evidence = thres_evidence
@@ -70,5 +70,5 @@ if __name__ == "__main__":
     parser.add_argument("--return_evidence_only", action="store_true", help="Only extract evidence without classification")
     args = parser.parse_args()
 
-    semviqa = SemViQA(args.model_evidence_QA, args.model_bc, args.model_tc, args.thres_evidence)
+    semviqa = SemViQAPipeline(args.model_evidence_QA, args.model_bc, args.model_tc, args.thres_evidence)
     semviqa.process_batch(args.data_path, args.output_path, args.return_evidence_only)

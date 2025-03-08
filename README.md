@@ -305,11 +305,11 @@ Alternatively, you can use **SemViQA** programmatically:
 !pip install semviqa
 
 # Import the pipeline
-from semviqa.pipeline import SemViQA
+from semviqa.pipeline import SemViQAPipeline
 claim = "Chiến tranh với Campuchia đã kết thúc trước khi Việt Nam thống nhất."
 context = "Sau khi thống nhất, Việt Nam tiếp tục gặp khó khăn do sự sụp đổ và tan rã của đồng minh Liên Xô cùng Khối phía Đông, các lệnh cấm vận của Hoa Kỳ, chiến tranh với Campuchia, biên giới giáp Trung Quốc và hậu quả của chính sách bao cấp sau nhiều năm áp dụng. Năm 1986, Đảng Cộng sản ban hành cải cách đổi mới, tạo điều kiện hình thành kinh tế thị trường và hội nhập sâu rộng. Cải cách đổi mới kết hợp cùng quy mô dân số lớn đưa Việt Nam trở thành một trong những nước đang phát triển có tốc độ tăng trưởng thuộc nhóm nhanh nhất thế giới, được coi là Hổ mới châu Á dù cho vẫn gặp phải những thách thức như tham nhũng, tội phạm gia tăng, ô nhiễm môi trường và phúc lợi xã hội chưa đầy đủ. Ngoài ra, giới bất đồng chính kiến, chính phủ một số nước phương Tây và các tổ chức theo dõi nhân quyền có quan điểm chỉ trích hồ sơ nhân quyền của Việt Nam liên quan đến các vấn đề tôn giáo, kiểm duyệt truyền thông, hạn chế hoạt động ủng hộ nhân quyền cùng các quyền tự do dân sự."
  
-semviqa = SemViQA(
+semviqa = SemViQAPipeline(
   model_evidence_QA="SemViQA/qatc-infoxlm-viwikifc", 
   model_bc="SemViQA/bc-infoxlm-viwikifc", 
   model_tc="SemViQA/tc-infoxlm-viwikifc", 
