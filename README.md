@@ -282,11 +282,11 @@ claim = "Chiến tranh với Campuchia đã kết thúc trước khi Việt Nam 
 evidence = "Sau khi thống nhất, Việt Nam tiếp tục gặp khó khăn do sự sụp đổ và tan rã của đồng minh Liên Xô cùng Khối phía Đông, các lệnh cấm vận của Hoa Kỳ, chiến tranh với Campuchia, biên giới giáp Trung Quốc và hậu quả của chính sách bao cấp sau nhiều năm áp dụng."
 
 verdict = "NEI"
-prob3class, pred_3_class = classify_claim(claim, evidence, model_tc, tokenizer, device)
+prob_tc, pred_tc = classify_claim(claim, evidence, model_tc, tokenizer, device)
 
-if pred_3_class != 0:
-  prob2class, pred_2_class = classify_claim(claim, evidence, model_bc, tokenizer, device)
-  verdict = "SUPPORTED" if pred_2_class == 0 else "REFUTED" if prob2class > prob3class else ["NEI", "SUPPORTED", "REFUTED"][pred_3_class]
+if pred_tc != 0:
+  prob_bc, pred_bc = classify_claim(claim, evidence, model_bc, tokenizer, device)
+  verdict = "SUPPORTED" if pred_bc == 0 else "REFUTED" if prob_bc > prob_tc else ["NEI", "SUPPORTED", "REFUTED"][pred_tc]
 
 print(verdict)
 # Output: REFUTED
@@ -311,8 +311,8 @@ context = "Sau khi thống nhất, Việt Nam tiếp tục gặp khó khăn do s
  
 semviqa = SemViQA(
   model_evidence_QA="SemViQA/qatc-infoxlm-viwikifc", 
-  model_2_class="SemViQA/bc-infoxlm-viwikifc", 
-  model_3_class="SemViQA/tc-infoxlm-viwikifc", 
+  model_bc="SemViQA/bc-infoxlm-viwikifc", 
+  model_tc="SemViQA/tc-infoxlm-viwikifc", 
   thres_evidence=0.5,
   length_ratio_threshold=0.5,
   is_qatc_faster=False

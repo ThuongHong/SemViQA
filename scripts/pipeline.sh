@@ -17,8 +17,8 @@ python3 semviqa/pipeline.py \
     --data_path "data/test.json" \
     --output_path "output.json" \
     --model_evidence_QA "SemViQA/qatc-infoxlm-viwikifc" \
-    --model_2_class "SemViQA/bc-infoxlm-viwikifc" \
-    --model_3_class "SemViQA/tc-infoxlm-viwikifc" \
+    --model_bc "SemViQA/bc-infoxlm-viwikifc" \
+    --model_tc "SemViQA/tc-infoxlm-viwikifc" \
     --thres_evidence 0.5
  
 echo "Inference process completed!"
