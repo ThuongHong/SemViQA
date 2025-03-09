@@ -1,5 +1,5 @@
 <p align="center">
-  <img alt="SemViQA Logo" src="image/logo.png" height="250" /> 
+  <img alt="SemViQA Logo" src="https://raw.githubusercontent.com/DAVID-NGUYEN-S16/SemViQA/main/image/logo.png" height="250" /> 
     <br>
   </p>
 </p>
