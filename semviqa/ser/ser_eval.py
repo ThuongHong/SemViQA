@@ -88,13 +88,13 @@ def extract_evidence_qatc_faster(claim, context, full_context, model_evidence_QA
     return -1  
 
 
-def tfidf_topk(context, claim, threshold=0.6, top_k=1):
+def tfidf_topk(claim, context, threshold=0.6, top_k=1):
     """
     Retrieves the top-k relevant sentences from the context using TF-IDF similarity.
 
     Args:
-        context (str): The context containing multiple sentences.
         claim (str): The claim statement.
+        context (str): The context containing multiple sentences.
         threshold (float): Threshold for sentence length ratio.
         top_k (int): Number of top sentences to return.
 
@@ -118,13 +118,13 @@ def tfidf_topk(context, claim, threshold=0.6, top_k=1):
     return sorted(zip(cosine_sim, corpus), reverse=True)[:top_k]
 
 
-def bm25_topk(context, claim, top_k=None):
+def bm25_topk(claim, context, top_k=None):
     """
     Retrieves the top-k relevant sentences from the context using BM25 ranking.
 
     Args:
-        context (str): The context containing multiple sentences.
         claim (str): The claim statement.
+        context (str): The context containing multiple sentences.
         top_k (int, optional): Number of top sentences to return. If None, returns all.
 
     Returns:
@@ -173,7 +173,7 @@ def extract_evidence_tfidf_qatc(claim, context, model_evidence_QA, tokenizer_QA,
     Returns:
         str: The best-matching evidence sentence.
     """
-    evidence_tf = tfidf_topk(context, claim, top_k=1, threshold= length_ratio_threshold)[0]
+    evidence_tf = tfidf_topk(claim, context, top_k=1, threshold=length_ratio_threshold)[0]
     if evidence_tf[0] > confidence_threshold:
         return evidence_tf[1]
 
