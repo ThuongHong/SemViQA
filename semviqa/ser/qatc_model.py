@@ -128,6 +128,6 @@ class QATCForQuestionAnswering(PreTrainedModel):
             loss=total_loss,
             start_logits=start_logits,
             end_logits=end_logits,
-            hidden_states=outputs.hidden_states if output_hidden_states else None,
-            attentions=outputs.attentions if output_attentions else None
+            hidden_states=outputs.hidden_states,
+            attentions=outputs.attentions
         )
