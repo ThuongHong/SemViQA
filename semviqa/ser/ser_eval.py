@@ -25,7 +25,8 @@ def extract_evidence_qatc(claim, context, model_evidence_QA, tokenizer_QA, devic
         str or int: The extracted evidence sentence or -1 if no valid evidence is found.
     """
     model_evidence_QA.to(device).eval()
-    inputs = tokenizer_QA(claim, context, return_tensors="pt", truncation=True, max_length=512, padding=True).to(device)
+    inputs = tokenizer_QA(claim, context, return_tensors="pt", truncation="only_second", max_length=512, padding="max_length")
+    inputs = {key: value.to(device) for key, value in inputs.items()}
 
     with torch.no_grad():
         outputs = model_evidence_QA(**inputs)
@@ -62,8 +63,9 @@ def extract_evidence_qatc_faster(claim, context, full_context, model_evidence_QA
     claim, context = ([claim], [context]) if isinstance(claim, str) else (claim, context)
     
     model_evidence_QA.to(device).eval()
-    inputs = tokenizer_QA(claim, context, return_tensors="pt", truncation=True, max_length=512, padding=True).to(device)
-
+    inputs = tokenizer_QA(claim, context, return_tensors="pt", truncation="only_second", max_length=512, padding="max_length")
+    inputs = {key: value.to(device) for key, value in inputs.items()}
+    
     with torch.no_grad():
         outputs = model_evidence_QA(**inputs)
 
