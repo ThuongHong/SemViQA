@@ -19,12 +19,12 @@ class SemViQAPipeline:
         self.is_qatc_faster = is_qatc_faster
         
         # Load models
-        self.tokenizer_QA = AutoTokenizer.from_pretrained(model_evidence_QA).to(self.device)
-        self.model_evidence_QA = QATCForQuestionAnswering.from_pretrained(model_evidence_QA).to(self.device)
+        self.tokenizer_QA = AutoTokenizer.from_pretrained(model_evidence_QA)
+        self.model_evidence_QA = QATCForQuestionAnswering.from_pretrained(model_evidence_QA)
         
-        self.tokenizer_classify = AutoTokenizer.from_pretrained(model_tc).to(self.device)
-        self.model_tc = ClaimModelForClassification.from_pretrained(model_tc).to(self.device)
-        self.model_bc = ClaimModelForClassification.from_pretrained(model_bc, num_labels=2).to(self.device)
+        self.tokenizer_classify = AutoTokenizer.from_pretrained(model_tc)
+        self.model_tc = ClaimModelForClassification.from_pretrained(model_tc)
+        self.model_bc = ClaimModelForClassification.from_pretrained(model_bc, num_labels=2)
         
     def predict(self, claim, context, return_evidence_only=False):
         evidence = extract_evidence_tfidf_qatc(
