@@ -184,9 +184,31 @@ def extract_evidence_tfidf_qatc(claim, context, model_evidence_QA, tokenizer_QA,
         evidence = extract_evidence_qatc(claim, context, model_evidence_QA, tokenizer_QA, device)
         return evidence if evidence != -1 else evidence_tf[1]
 
+    tokens = context.split(' ')
+    token_sentences = [l.split(' ') for l in sentences]
+
+    tmp_context_token = []
+    tmp_context = []
     sub_contexts = []
-    for i in range(0, len(sentences), 10):
-        sub_contexts.append('. '.join(sentences[i:i+10]))
+    for idx in range(len(sentences)):
+        check = True
+        if len(token_sentences[idx] + tmp_context_token) <=400:
+            tmp_context_token += token_sentences[idx]
+            tmp_context.append(sentences[idx])
+            check = False
+        
+        if len(token_sentences[idx] + tmp_context_token) > 400 or idx == len(sentences) - 1:
+            context_sub = '. '.join(tmp_context)
+            if len(context_sub)== 0: 
+                continue
+            sub_contexts.append(context_sub)
+
+            if check:
+                tmp_context_token = token_sentences[idx]
+                tmp_context = [sentences[idx]]
+            else:
+                tmp_context_token = []
+                tmp_context = []
 
     if is_qatc_faster:
         return extract_evidence_qatc_faster(claim, sub_contexts, context, model_evidence_QA, tokenizer_QA, device)
