@@ -184,7 +184,6 @@ def extract_evidence_tfidf_qatc(claim, context, model_evidence_QA, tokenizer_QA,
         evidence = extract_evidence_qatc(claim, context, model_evidence_QA, tokenizer_QA, device)
         return evidence if evidence != -1 else evidence_tf[1]
 
-    tokens = context.split(' ')
     token_sentences = [l.split(' ') for l in sentences]
 
     tmp_context_token = []
