@@ -14,10 +14,11 @@ export PYTHONPATH="SemViQA:$PYTHONPATH"
 echo "Running training script..."
 
 BS=36
-python3 semviqa.ser.main \
+# If you want to fine-tune a pre-trained model, run the following script.
+python3 -m semviqa.ser.main \
     --project "isedsc" \
-    --model_name "microsoft/infoxlm-large" \
-    --output_dir "./infoxlm-large_isedsc_qact" \
+    --model_name "SemViQA/qatc-infoxlm-viwikifc" \
+    --output_dir "./output" \
     --train_batch_size $BS \
     --num_train_epochs 16 \
     --learning_rate 2e-6 \
@@ -25,5 +26,19 @@ python3 semviqa.ser.main \
     --eval_data  "test.csv"\
     --patience 5 \
     --is_pretrained 1\
+
+# If you want to fine-tune an untrained model, run the following script.
+# model_name = "microsoft/infoxlm-large", "microsoft/infoxlm-base" or "nguyenvulebinh/vi-mrc-large", "nguyenvulebinh/vi-mrc-base"
+python3 -m semviqa.ser.main \
+    --project "isedsc" \
+    --model_name "microsoft/infoxlm-large" \
+    --output_dir "./output" \
+    --train_batch_size $BS \
+    --num_train_epochs 16 \
+    --learning_rate 2e-6 \
+    --train_data  "train.csv" \
+    --eval_data  "test.csv"\
+    --patience 5 \
+    --is_pretrained 0\
 
 echo "Training completed for model"

@@ -14,7 +14,7 @@ import os
 import time
 import multiprocessing
 
-from data_utils import Data
+from .data_utils import Data
 from .model import ClaimModelConfig, ClaimModelForClassification
 
 multiprocessing.set_start_method('spawn', force=True)
