@@ -133,7 +133,6 @@ def main(args):
             )
 
             loss = output.loss
-            print(loss)
             accelerator.backward(loss)
 
             if accelerator.sync_gradients:

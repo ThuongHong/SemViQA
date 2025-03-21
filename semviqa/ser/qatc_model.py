@@ -116,7 +116,7 @@ class QATCForQuestionAnswering(PreTrainedModel):
             "pt": rational_tag_logits
         }
 
-        if start_logits == None and end_logits == None and tagging_labels == None:
+        if start_logits != None and end_logits != None and tagging_labels != None:
             total_loss = self.loss_fn(loss_inputs)
         else:
             total_loss = None
