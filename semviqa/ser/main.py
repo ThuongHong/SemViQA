@@ -247,6 +247,7 @@ def parse_args():
     parser.add_argument("--is_train", type=int, default=1, help="Set to True if training")
     parser.add_argument("--is_eval", type=int, default=1, help="Set to Eval")
     parser.add_argument("--patience", type=int, default=5, help="Patience for early stopping")
+    parser.add_argument("--is_pretrained", type=int, default=0, help="Load pre-trained model")
     args = parser.parse_args()
     return args
 if __name__ == "__main__":

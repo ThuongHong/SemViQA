@@ -29,5 +29,6 @@ python3 semviqa/tvc/main.py \
     --type_loss "focal" \
     --output_dir "./xlm-roberta-large_viwiki_2class_focal" \
     --n_classes 2\
+    --is_pretrained 1\
 
 echo "Training script completed!"

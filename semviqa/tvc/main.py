@@ -197,6 +197,7 @@ def parse_args():
     parser.add_argument('--is_weighted', type=int, default=0)
     parser.add_argument('--dropout_prob', type=float, default=0.3)
     parser.add_argument('--accumulation_steps', type=int, default=1)
+    parser.add_argument('--is_pretrained', type=int, default=0)
     return parser.parse_args()
 
 if __name__ == '__main__':

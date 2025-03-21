@@ -23,6 +23,7 @@ python3 semviqa/ser/main.py \
     --learning_rate 2e-6 \
     --train_data  "train.csv" \
     --eval_data  "test.csv"\
-    --patience 5
+    --patience 5 \
+    --is_pretrained 1\
 
 echo "Training completed for model"
