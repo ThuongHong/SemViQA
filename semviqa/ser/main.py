@@ -37,13 +37,15 @@ def load_models(args):
     )
     
     model = QATCForQuestionAnswering(config)
+    if args.is_pretrained:
+        model = QATCForQuestionAnswering.from_pretrained(args.model_name, config=config)
     
-    if args.is_load_weight:
-        print("loading train weight")
-        if "safetensors" in args.weight_model:
-            load_model(model, f"{args.weight_model}")
-        else:
-            model.load_state_dict(torch.load(args.weight_model), strict=False)
+    # if args.is_load_weight:
+    #     print("loading train weight")
+    #     if "safetensors" in args.weight_model:
+    #         load_model(model, f"{args.weight_model}")
+    #     else:
+    #         model.load_state_dict(torch.load(args.weight_model), strict=False)
     
     count_parameters(model)
     return model, config
