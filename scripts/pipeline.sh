@@ -19,6 +19,7 @@ python3 semviqa/pipeline \
     --model_evidence_QA "SemViQA/qatc-infoxlm-viwikifc" \
     --model_bc "SemViQA/bc-infoxlm-viwikifc" \
     --model_tc "SemViQA/tc-infoxlm-viwikifc" \
-    --thres_evidence 0.5
+    --thres_evidence 0.5\
+    
  
 echo "Inference process completed!"

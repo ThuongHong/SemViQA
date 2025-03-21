@@ -67,8 +67,10 @@ if __name__ == "__main__":
     parser.add_argument("--model_bc", type=str, default="bc", help="Model 2 class") 
     parser.add_argument("--model_tc", type=str, default="tc", help="Model 3 class") 
     parser.add_argument("--thres_evidence", type=float, default=0.5, help="Threshold evidence")
+    parser.add_argument("--length_ratio_threshold", type=float, default=0.6, help="Length ratio threshold")
+    parser.add_argument("--is_qatc_faster", action="store_true", help="Use faster version of QATC")
     parser.add_argument("--return_evidence_only", action="store_true", help="Only extract evidence without classification")
     args = parser.parse_args()
 
-    semviqa = SemViQAPipeline(args.model_evidence_QA, args.model_bc, args.model_tc, args.thres_evidence)
+    semviqa = SemViQAPipeline(args.model_evidence_QA, args.model_bc, args.model_tc, args.thres_evidence, args.length_ratio_threshold, args.is_qatc_faster)
     semviqa.process_batch(args.data_path, args.output_path, args.return_evidence_only)
