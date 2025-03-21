@@ -14,7 +14,7 @@ export PYTHONPATH="SemViQA:$PYTHONPATH"
 echo "Running training script..."
 
 BS=36
-python3 semviqa/ser/main.py \
+python3 semviqa.ser.main \
     --project "isedsc" \
     --model_name "microsoft/infoxlm-large" \
     --output_dir "./infoxlm-large_isedsc_qact" \

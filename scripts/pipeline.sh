@@ -13,7 +13,7 @@ echo "Conda Environment: $CONDA_DEFAULT_ENV"
 export PYTHONPATH="SemViQA:$PYTHONPATH"
 echo "Starting the inference process..."
 
-python3 semviqa/pipeline.py \
+python3 semviqa/pipeline \
     --data_path "data/test.json" \
     --output_path "output.json" \
     --model_evidence_QA "SemViQA/qatc-infoxlm-viwikifc" \

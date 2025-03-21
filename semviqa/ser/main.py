@@ -36,9 +36,10 @@ def load_models(args):
         beta=args.beta
     )
     
-    model = QATCForQuestionAnswering(config)
     if args.is_pretrained:
         model = QATCForQuestionAnswering.from_pretrained(args.model_name, config=config)
+    else:
+        model = QATCForQuestionAnswering(config)
     
     # if args.is_load_weight:
     #     print("loading train weight")
@@ -199,8 +200,8 @@ def main(args):
                 os.makedirs(save_path)
             # accelerator.save_state(save_path)
             model.save_pretrained(save_path)
-            torch.save(optimizer.state_dict(), os.path.join(save_path, "optimizer.bin"))
-            torch.save(lr_scheduler.state_dict(), os.path.join(save_path, "scheduler.bin"))
+            # torch.save(optimizer.state_dict(), os.path.join(save_path, "optimizer.bin"))
+            # torch.save(lr_scheduler.state_dict(), os.path.join(save_path, "scheduler.bin"))
             tokenizer.save_pretrained(save_path)
             config.save_pretrained(save_path)
             best_acc = accuracy

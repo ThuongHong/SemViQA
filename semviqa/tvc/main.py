@@ -56,9 +56,11 @@ def main(args):
         dropout=args.dropout_prob,
         loss_type=args.type_loss
     )
-    model = ClaimVerificationModel(config).to(device)
+
     if args.is_pretrained:
         model = ClaimVerificationModel.from_pretrained(args.model_name, config=config).to(device)
+    else:
+        model = ClaimVerificationModel(config).to(device)
     count_parameters(model)
 
     train_dataset = Data(train_data, tokenizer, args, max_len=args.max_len)

@@ -14,7 +14,7 @@ export PYTHONPATH="SemViQA:$PYTHONPATH"
 echo "Running training script..."
 
 BS=104 
-python3 semviqa/tvc/main.py \
+python3 semviqa.tvc.main \
     --train_data "train.csv" \
     --dev_data "test.csv" \
     --model_name "FacebookAI/xlm-roberta-large" \
