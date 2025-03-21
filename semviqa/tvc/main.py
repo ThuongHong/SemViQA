@@ -50,16 +50,19 @@ def main(args):
  
     tokenizer = AutoTokenizer.from_pretrained(args.model_name)
 
-    config = ClaimModelConfig(
-        model_name=args.model_name,
-        num_labels=args.n_classes,
-        dropout=args.dropout_prob,
-        loss_type=args.type_loss
-    )
-
     if args.is_pretrained:
+        config = ClaimModelConfig.from_pretrained(args.model_name)
+        config.num_labels = args.n_classes
+        config.dropout = args.dropout_prob
+        config.loss_type = args.type_loss
         model = ClaimModelForClassification.from_pretrained(args.model_name, config=config).to(device)
     else:
+        config = ClaimModelConfig(
+            model_name=args.model_name,
+            num_labels=args.n_classes,
+            dropout=args.dropout_prob,
+            loss_type=args.type_loss
+        )
         model = ClaimModelForClassification(config).to(device)
     count_parameters(model)
 

@@ -29,16 +29,19 @@ def count_parameters(model):
     print(f"Trainable parameters: {active_params}")
 
 def load_models(args):
-    config = QATCConfig(
-        model_name=args.model_name,
-        freeze_text_encoder=args.freeze_text_encoder,
-        alpha=args.alpha,
-        beta=args.beta
-    )
     
     if args.is_pretrained:
+        config = QATCConfig.from_pretrained(args.model_name)
+        config.alpha = args.alpha
+        config.beta = args.beta
         model = QATCForQuestionAnswering.from_pretrained(args.model_name, config=config)
     else:
+        config = QATCConfig(
+            model_name=args.model_name,
+            freeze_text_encoder=args.freeze_text_encoder,
+            alpha=args.alpha,
+            beta=args.beta
+        )
         model = QATCForQuestionAnswering(config)
     
     # if args.is_load_weight:
