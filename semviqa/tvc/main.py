@@ -15,7 +15,7 @@ import time
 import multiprocessing
 
 from data_utils import Data
-from model import ClaimVerificationConfig, ClaimVerificationModel
+from .model import ClaimModelConfig, ClaimModelForClassification
 
 multiprocessing.set_start_method('spawn', force=True)
 
@@ -50,7 +50,7 @@ def main(args):
  
     tokenizer = AutoTokenizer.from_pretrained(args.model_name)
 
-    config = ClaimVerificationConfig(
+    config = ClaimModelConfig(
         model_name=args.model_name,
         num_labels=args.n_classes,
         dropout=args.dropout_prob,
@@ -58,9 +58,9 @@ def main(args):
     )
 
     if args.is_pretrained:
-        model = ClaimVerificationModel.from_pretrained(args.model_name, config=config).to(device)
+        model = ClaimModelForClassification.from_pretrained(args.model_name, config=config).to(device)
     else:
-        model = ClaimVerificationModel(config).to(device)
+        model = ClaimModelForClassification(config).to(device)
     count_parameters(model)
 
     train_dataset = Data(train_data, tokenizer, args, max_len=args.max_len)
