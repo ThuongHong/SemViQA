@@ -7,7 +7,7 @@ import gc
 from sklearn.metrics import f1_score, cohen_kappa_score, matthews_corrcoef
 from accelerate import Accelerator
 from accelerate.logging import get_logger
-from accelerate.utils import ProjectConfiguration, set_seed
+from accelerate.utils import ProjectConfiguration, set_seed, DeepSpeedPlugin
 from tqdm import tqdm
 from transformers import default_data_collator
 from torch.utils.data import DataLoader
@@ -16,8 +16,8 @@ import time
 from safetensors.torch import load_model
 from transformers import AutoTokenizer
 
-from .qatc_model import QATCConfig, QATCForQuestionAnswering
-from .data_utils import load_data 
+from semviqa.ser.qatc_model import QATCConfig, QATCForQuestionAnswering
+from semviqa.ser.data_utils import load_data 
 
 os.environ["WANDB__SERVICE_WAIT"] = "300"
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
@@ -54,9 +54,9 @@ def load_models(args):
     count_parameters(model)
     return model, config
 
-def setting_optimizer(config, model):
+def setting_optimizer(args, model):
     optimizer_cls = torch.optim.AdamW
-    return optimizer_cls(model.parameters(), lr=config.learning_rate)
+    return optimizer_cls(model.parameters(), lr=args.learning_rate)
 
 def main(args):
     logger = get_logger(__name__, log_level="INFO")
@@ -66,10 +66,17 @@ def main(args):
         project_dir=args.output_dir, logging_dir=logging_dir
     )
 
+    ds_plugin = DeepSpeedPlugin(
+        zero_stage=2,
+        gradient_accumulation_steps=args.gradient_accumulation_steps,
+        hf_ds_config=args.ds_config,
+    )
+
     accelerator = Accelerator(
         log_with=args.report_to,
         gradient_accumulation_steps=args.gradient_accumulation_steps,
-        project_config=accelerator_project_config
+        project_config=accelerator_project_config,
+        deepspeed_plugin=ds_plugin
     )
 
     logging.basicConfig(
@@ -86,9 +93,7 @@ def main(args):
         os.makedirs(args.output_dir, exist_ok=True)
 
     model, config = load_models(args)
-    model = accelerator.prepare(model)
     tokenizer = AutoTokenizer.from_pretrained(args.model_name)
-
     optimizer = setting_optimizer(args, model)
     train_dataset, test_dataset = load_data(args, tokenizer)
     
@@ -106,10 +111,10 @@ def main(args):
         print("loading scheduler weight")
         lr_scheduler.load_state_dict(torch.load(args.weight_scheduler))
 
-    optimizer, train_dataloader, lr_scheduler = accelerator.prepare(optimizer, train_dataloader, lr_scheduler)
+    model, optimizer, train_dataloader, eval_dataloader, lr_scheduler = accelerator.prepare(
+        model, optimizer, train_dataloader, eval_dataloader, lr_scheduler
+    )
 
-    progress_bar = tqdm(desc="Steps", disable=not accelerator.is_local_main_process)
- 
     best_acc = 0.0
 
     print("Starting training...")
@@ -119,6 +124,7 @@ def main(args):
 
     for epoch in range(args.num_train_epochs):
         model.train()
+        train_bar = tqdm(total=len(train_dataloader), desc=f"Epoch {epoch+1}/{args.num_train_epochs} [Train]", disable=not accelerator.is_local_main_process)
         train_loss = 0.0
         for step, batch in enumerate(train_dataloader):
             for key in batch:
@@ -146,7 +152,8 @@ def main(args):
             avg_loss = accelerator.gather(loss.repeat(args.train_batch_size)).mean()
             train_loss += avg_loss.item() / args.gradient_accumulation_steps
             logs = {"step": f"{step}/{len(train_dataloader)}", "step_loss": loss.detach().item(), "lr": lr_scheduler.get_last_lr()[0]}
-            progress_bar.set_postfix(logs)
+            train_bar.set_postfix(logs)
+            train_bar.update(1)
             global_step += 1
             
             if global_step % args.max_iter == 0:
@@ -159,10 +166,12 @@ def main(args):
                     }) 
                 train_loss = 0.0
 
+        train_bar.close()
         train_loss /= len(train_dataloader)
         print(f"Epoch {epoch+1} - Train Loss: {train_loss}")
 
         model.eval()
+        eval_bar = tqdm(total=len(eval_dataloader), desc=f"Epoch {epoch+1}/{args.num_train_epochs} [Eval]", disable=not accelerator.is_local_main_process)
         eval_loss = 0.0
         predictions, true_positions = [], []
         
@@ -190,8 +199,9 @@ def main(args):
                 predictions.extend(list(zip(start_preds, end_preds)))
                 true_positions.extend(list(zip(start_true, end_true)))
             
-            progress_bar.update(1)
+            eval_bar.update(1)
 
+        eval_bar.close()
         eval_loss /= len(eval_dataloader)
         accuracy = np.mean([p == t for p, t in zip(predictions, true_positions)])
 
@@ -252,6 +262,7 @@ def parse_args():
     parser.add_argument("--is_eval", type=int, default=1, help="Set to Eval")
     parser.add_argument("--patience", type=int, default=5, help="Patience for early stopping")
     parser.add_argument("--is_pretrained", type=int, default=0, help="Load pre-trained model")
+    parser.add_argument("--ds_config", type=str, default="SemViQA/semviqa/ser/ds_zero2.json", help="DeepSpeed config file")
     args = parser.parse_args()
     return args
 if __name__ == "__main__":
