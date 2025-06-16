@@ -7,7 +7,7 @@ import gc
 from sklearn.metrics import f1_score, cohen_kappa_score, matthews_corrcoef
 from accelerate import Accelerator
 from accelerate.logging import get_logger
-from accelerate.utils import ProjectConfiguration, set_seed
+from accelerate.utils import ProjectConfiguration, set_seed, DeepSpeedPlugin
 from tqdm import tqdm
 from transformers import default_data_collator
 from torch.utils.data import DataLoader
@@ -54,9 +54,9 @@ def load_models(args):
     count_parameters(model)
     return model, config
 
-def setting_optimizer(config, model):
+def setting_optimizer(args, model):
     optimizer_cls = torch.optim.AdamW
-    return optimizer_cls(model.parameters(), lr=config.learning_rate)
+    return optimizer_cls(model.parameters(), lr=args.learning_rate)
 
 def main(args):
     logger = get_logger(__name__, log_level="INFO")
@@ -66,10 +66,13 @@ def main(args):
         project_dir=args.output_dir, logging_dir=logging_dir
     )
 
+    ds_plugin = DeepSpeedPlugin(zero_stage=2, config_file=args.ds_config)
+
     accelerator = Accelerator(
         log_with=args.report_to,
         gradient_accumulation_steps=args.gradient_accumulation_steps,
-        project_config=accelerator_project_config
+        project_config=accelerator_project_config,
+        deepspeed_plugin=ds_plugin
     )
 
     logging.basicConfig(
@@ -86,9 +89,7 @@ def main(args):
         os.makedirs(args.output_dir, exist_ok=True)
 
     model, config = load_models(args)
-    model = accelerator.prepare(model)
     tokenizer = AutoTokenizer.from_pretrained(args.model_name)
-
     optimizer = setting_optimizer(args, model)
     train_dataset, test_dataset = load_data(args, tokenizer)
     
@@ -106,7 +107,9 @@ def main(args):
         print("loading scheduler weight")
         lr_scheduler.load_state_dict(torch.load(args.weight_scheduler))
 
-    optimizer, train_dataloader, lr_scheduler = accelerator.prepare(optimizer, train_dataloader, lr_scheduler)
+    model, optimizer, train_dataloader, eval_dataloader, lr_scheduler = accelerator.prepare(
+        model, optimizer, train_dataloader, eval_dataloader, lr_scheduler
+    )
 
     progress_bar = tqdm(desc="Steps", disable=not accelerator.is_local_main_process)
  
@@ -252,6 +255,7 @@ def parse_args():
     parser.add_argument("--is_eval", type=int, default=1, help="Set to Eval")
     parser.add_argument("--patience", type=int, default=5, help="Patience for early stopping")
     parser.add_argument("--is_pretrained", type=int, default=0, help="Load pre-trained model")
+    parser.add_argument("--ds_config", type=str, default="SemViQA/semviqa/ser/ds_zero2.json", help="DeepSpeed config file")
     args = parser.parse_args()
     return args
 if __name__ == "__main__":
