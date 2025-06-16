@@ -115,8 +115,6 @@ def main(args):
         model, optimizer, train_dataloader, eval_dataloader, lr_scheduler
     )
 
-    progress_bar = tqdm(desc="Steps", disable=not accelerator.is_local_main_process)
- 
     best_acc = 0.0
 
     print("Starting training...")
@@ -126,6 +124,7 @@ def main(args):
 
     for epoch in range(args.num_train_epochs):
         model.train()
+        train_bar = tqdm(total=len(train_dataloader), desc=f"Epoch {epoch+1}/{args.num_train_epochs} [Train]", disable=not accelerator.is_local_main_process)
         train_loss = 0.0
         for step, batch in enumerate(train_dataloader):
             for key in batch:
@@ -153,7 +152,8 @@ def main(args):
             avg_loss = accelerator.gather(loss.repeat(args.train_batch_size)).mean()
             train_loss += avg_loss.item() / args.gradient_accumulation_steps
             logs = {"step": f"{step}/{len(train_dataloader)}", "step_loss": loss.detach().item(), "lr": lr_scheduler.get_last_lr()[0]}
-            progress_bar.set_postfix(logs)
+            train_bar.set_postfix(logs)
+            train_bar.update(1)
             global_step += 1
             
             if global_step % args.max_iter == 0:
@@ -166,10 +166,12 @@ def main(args):
                     }) 
                 train_loss = 0.0
 
+        train_bar.close()
         train_loss /= len(train_dataloader)
         print(f"Epoch {epoch+1} - Train Loss: {train_loss}")
 
         model.eval()
+        eval_bar = tqdm(total=len(eval_dataloader), desc=f"Epoch {epoch+1}/{args.num_train_epochs} [Eval]", disable=not accelerator.is_local_main_process)
         eval_loss = 0.0
         predictions, true_positions = [], []
         
@@ -197,8 +199,9 @@ def main(args):
                 predictions.extend(list(zip(start_preds, end_preds)))
                 true_positions.extend(list(zip(start_true, end_true)))
             
-            progress_bar.update(1)
+            eval_bar.update(1)
 
+        eval_bar.close()
         eval_loss /= len(eval_dataloader)
         accuracy = np.mean([p == t for p, t in zip(predictions, true_positions)])
 
