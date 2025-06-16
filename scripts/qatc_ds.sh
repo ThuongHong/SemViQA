@@ -28,7 +28,8 @@ DS_CONFIG="SemViQA/semviqa/ser/ds_zero2.json"
 accelerate launch \
     --multi_gpu \
     --num_processes $(nvidia-smi -L | wc -l) \
-    SemViQA/semviqa/ser/main.py \
+    --module semviqa.ser.main \
+    # SemViQA/semviqa/ser/main.py \
         --model_name "$MODEL_NAME" \
         --output_dir "$OUTPUT_DIR" \
         --train_batch_size $BS \

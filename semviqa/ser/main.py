@@ -16,8 +16,8 @@ import time
 from safetensors.torch import load_model
 from transformers import AutoTokenizer
 
-from .qatc_model import QATCConfig, QATCForQuestionAnswering
-from .data_utils import load_data 
+from semviqa.ser.qatc_model import QATCConfig, QATCForQuestionAnswering
+from semviqa.ser.data_utils import load_data 
 
 os.environ["WANDB__SERVICE_WAIT"] = "300"
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
