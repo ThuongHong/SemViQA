@@ -66,7 +66,11 @@ def main(args):
         project_dir=args.output_dir, logging_dir=logging_dir
     )
 
-    ds_plugin = DeepSpeedPlugin(zero_stage=2, config_file=args.ds_config)
+    ds_plugin = DeepSpeedPlugin(
+        zero_stage=2,
+        gradient_accumulation_steps=args.gradient_accumulation_steps,
+        custom_ds_config=args.ds_config,
+    )
 
     accelerator = Accelerator(
         log_with=args.report_to,
