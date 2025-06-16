@@ -69,7 +69,7 @@ def main(args):
     ds_plugin = DeepSpeedPlugin(
         zero_stage=2,
         gradient_accumulation_steps=args.gradient_accumulation_steps,
-        custom_ds_config=args.ds_config,
+        hf_ds_config=args.ds_config,
     )
 
     accelerator = Accelerator(
