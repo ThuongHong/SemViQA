@@ -16,7 +16,7 @@ echo "Running training script..."
 BS=36
 # If you want to fine-tune a pre-trained model, run the following script.
 python3 -m semviqa.ser.main \
-    --project "isedsc" \
+    --name "isedsc" \
     --model_name "SemViQA/qatc-infoxlm-viwikifc" \
     --output_dir "./output" \
     --train_batch_size $BS \
@@ -30,7 +30,7 @@ python3 -m semviqa.ser.main \
 # If you want to fine-tune an untrained model, run the following script.
 # model_name = "microsoft/infoxlm-large", "microsoft/infoxlm-base" or "nguyenvulebinh/vi-mrc-large", "nguyenvulebinh/vi-mrc-base"
 python3 -m semviqa.ser.main \
-    --project "isedsc" \
+    --name "isedsc" \
     --model_name "microsoft/infoxlm-large" \
     --output_dir "./output" \
     --train_batch_size $BS \

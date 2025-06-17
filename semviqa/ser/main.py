@@ -243,6 +243,8 @@ def parse_args():
     parser.add_argument("--freeze_text_encoder", type=int, default=0, help="Whether to freeze the text encoder")
     parser.add_argument("--beta", type=float, default=0.1, help="Beta")
     parser.add_argument("--alpha", type=float, default=1, help="Alpha")
+    parser.add_argument("--lambda_sparse", type=float, default=0.01, help="Lambda for sparsity loss")
+    parser.add_argument("--lambda_continuity", type=float, default=0.01, help="Lambda for continuity loss")
     parser.add_argument("--is_load_weight", type=int, default=0, help="Load weights from pre-trained model")
     parser.add_argument("--weight_model", type=str, default="/kaggle/input/weight-QACT/pytorch_model.bin", help="Path to model weights")
     parser.add_argument("--weight_optimizer", type=str, default="/kaggle/input/weight-QACT/optimizer.bin", help="Path to optimizer weights")

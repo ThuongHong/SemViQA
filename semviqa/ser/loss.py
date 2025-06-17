@@ -96,9 +96,11 @@ class comboLoss(nn.Module):
         super(comboLoss, self).__init__()
         self.alpha = config.alpha
         self.beta = config.beta
+        self.lambda_sparse = config.lambda_sparse
+        self.lambda_continuity = config.lambda_continuity
         # self.BaseLoss = BaseLoss()
         self.RTLoss = RTLoss()
-        self.reg_loss_fn = RationaleRegularizationLoss(lambda_sparse=0.01, lambda_continuity=0.01)
+        self.reg_loss_fn = RationaleRegularizationLoss(lambda_sparse=self.lambda_sparse, lambda_continuity=self.lambda_continuity)
         self.config = config
         
     def forward(self, output: dict):
