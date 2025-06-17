@@ -22,7 +22,7 @@ DS_CONFIG="./semviqa/ser/ds_zero2.json"
 accelerate launch \\
     --multi_gpu \\
     --num_processes $(nvidia-smi -L | wc -l) \\
-    ./semviqa/ser/main.py \\
+    ./semviqa/ser/main_ds.py \\
         --model_name "microsoft/infoxlm-large" \\
         --output_dir "$OUTPUT_DIR" \\
         --train_batch_size $BS \\
