@@ -14,13 +14,17 @@ class QATCConfig(PretrainedConfig):
         freeze_text_encoder=False,
         alpha=1.0,
         beta=0.01,
+        lambda_sparse=0.01,
+        lambda_continuity=0.01,
         **kwargs
     ):
         super().__init__(**kwargs)
         self.model_name = model_name
         self.freeze_text_encoder = freeze_text_encoder
         self.alpha = alpha  
-        self.beta = beta    
+        self.beta = beta
+        self.lambda_sparse = lambda_sparse
+        self.lambda_continuity = lambda_continuity
 
 class Rational_Tagging(nn.Module):
     def __init__(self, hidden_size):
