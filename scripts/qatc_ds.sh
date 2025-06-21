@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 nvidia-smi
-pip install deepspeed
 source ~/.bashrc
 
 # Log GPU utilization in background
