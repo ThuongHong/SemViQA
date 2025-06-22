@@ -194,6 +194,7 @@ def main(args):
 
         if stop_by_time:
             print(f"Stopping training early due to max_time={max_time}s.")
+            accelerator.wait_for_everyone()  
             break
 
         train_bar.close()
@@ -265,9 +266,7 @@ def main(args):
         print("Loading best_trainloss model for evaluation...")
         best_trainloss_path = os.path.join(args.output_dir, f"best_trainloss_{args.name}")
         if os.path.exists(best_trainloss_path):
-            model = QATCForQuestionAnswering.from_pretrained(best_trainloss_path)
-            tokenizer = AutoTokenizer.from_pretrained(best_trainloss_path)
-            config = QATCConfig.from_pretrained(best_trainloss_path)
+            model = QATCForQuestionAnswering.from_pretrained(best_trainloss_path) 
             model.to(accelerator.device)
             model.eval()
             eval_loss = 0.0
