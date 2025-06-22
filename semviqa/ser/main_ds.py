@@ -128,14 +128,15 @@ def main(args):
     stop_by_time = False
 
     for epoch in range(args.num_train_epochs):
-        if max_time is not None and (time.time() - start_time) > max_time:
-            print(f"Reached max_time={max_time}s, stopping training early.")
-            stop_by_time = True
-            break
         model.train()
         train_bar = tqdm(total=len(train_dataloader), desc=f"Epoch {epoch+1}/{args.num_train_epochs} [Train]", disable=not accelerator.is_local_main_process)
         train_loss = 0.0
         for step, batch in enumerate(train_dataloader):
+            if max_time is not None and (time.time() - start_time) > max_time:
+                print(f"Reached max_time={max_time}s, stopping training early.")
+                stop_by_time = True
+                train_bar.close()
+                return  
             for key in batch:
                 batch[key] = batch[key].to(accelerator.device)
             batch['Tagging'] = batch['Tagging'].to(torch.float32)
@@ -256,7 +257,6 @@ def main(args):
 
     print("Training completed in:", time.time() - start_time, "seconds.")
 
-    # Nếu dừng do hết thời gian, load lại best_trainloss để đánh giá
     if stop_by_time and accelerator.is_main_process:
         print("Loading best_trainloss model for evaluation...")
         best_trainloss_path = os.path.join(args.output_dir, f"best_trainloss_{args.name}")
