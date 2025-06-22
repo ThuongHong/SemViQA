@@ -175,7 +175,6 @@ def main(args):
         print(f"Epoch {epoch+1} - Train Loss: {train_loss}")
 
         model.eval()
-        eval_bar = tqdm(total=len(eval_dataloader), desc=f"Epoch {epoch+1}/{args.num_train_epochs} [Eval]", disable=not accelerator.is_local_main_process)
         eval_loss = 0.0
         predictions, true_positions = [], []
         
@@ -202,33 +201,38 @@ def main(args):
 
                 predictions.extend(list(zip(start_preds, end_preds)))
                 true_positions.extend(list(zip(start_true, end_true)))
-            
-            eval_bar.update(1)
+            # Không cần eval_bar.update(1) vì chỉ main process mới log
 
-        eval_bar.close()
-        eval_loss /= len(eval_dataloader)
-        accuracy = np.mean([p == t for p, t in zip(predictions, true_positions)])
+        # Gather predictions and true_positions from all processes về main process
+        gathered_predictions = accelerator.gather_for_metrics(torch.tensor(predictions, device=accelerator.device))
+        gathered_true_positions = accelerator.gather_for_metrics(torch.tensor(true_positions, device=accelerator.device))
 
-        print(f"Epoch {epoch+1} - Eval Loss: {eval_loss} - Accuracy: {accuracy}")
+        if accelerator.is_main_process:
+            # Convert tensors to list of tuples
+            all_predictions = [tuple(x.tolist()) for x in gathered_predictions]
+            all_true_positions = [tuple(x.tolist()) for x in gathered_true_positions]
+            eval_loss = eval_loss / len(eval_dataloader)
+            accuracy = np.mean([p == t for p, t in zip(all_predictions, all_true_positions)])
+            print(f"Epoch {epoch+1} - Eval Loss: {eval_loss} - Accuracy: {accuracy}")
 
-        if accuracy > best_acc:
-            save_path = os.path.join(args.output_dir, f"best {args.name}")
-            if not os.path.exists(save_path):
-                os.makedirs(save_path)
-            # accelerator.save_state(save_path)
-            model.save_pretrained(save_path)
-            # torch.save(optimizer.state_dict(), os.path.join(save_path, "optimizer.bin"))
-            # torch.save(lr_scheduler.state_dict(), os.path.join(save_path, "scheduler.bin"))
-            tokenizer.save_pretrained(save_path)
-            config.save_pretrained(save_path)
-            best_acc = accuracy
-            print("Save model best acc at epoch", epoch)
-            cnt = 0
-        else:
-            cnt += 1
-        if cnt == args.patience:
-            print(f"Early stopping at epoch {epoch}.")
-            break
+            if accuracy > best_acc:
+                save_path = os.path.join(args.output_dir, f"best {args.name}")
+                if not os.path.exists(save_path):
+                    os.makedirs(save_path)
+                # accelerator.save_state(save_path)
+                model.save_pretrained(save_path)
+                # torch.save(optimizer.state_dict(), os.path.join(save_path, "optimizer.bin"))
+                # torch.save(lr_scheduler.state_dict(), os.path.join(save_path, "scheduler.bin"))
+                tokenizer.save_pretrained(save_path)
+                config.save_pretrained(save_path)
+                best_acc = accuracy
+                print("Save model best acc at epoch", epoch)
+                cnt = 0
+            else:
+                cnt += 1
+            if cnt == args.patience:
+                print(f"Early stopping at epoch {epoch}.")
+                break
 
     print("Training completed in:", time.time() - start_time, "seconds.")
 
