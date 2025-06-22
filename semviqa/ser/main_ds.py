@@ -161,13 +161,29 @@ def main(args):
             global_step += 1
             
             if global_step % args.max_iter == 0:
-                train_loss = round(train_loss / args.max_iter, 4)
+                # Gather train_loss từ tất cả GPU
+                gathered_train_loss = accelerator.gather_for_metrics(torch.tensor([train_loss], device=accelerator.device))
+                avg_train_loss = gathered_train_loss.mean().item() / args.max_iter
+                avg_train_loss = round(avg_train_loss, 4)
 
-                print({
+                if not hasattr(main, 'best_train_loss'):
+                    main.best_train_loss = float('inf')
+
+                if accelerator.is_main_process:
+                    print({
                         'global_step': global_step,
-                        'Train loss': train_loss, 
-                        "epoch": epoch,
-                    }) 
+                        'Train loss': avg_train_loss,
+                        'epoch': epoch,
+                    })
+                    if avg_train_loss < main.best_train_loss:
+                        save_path = os.path.join(args.output_dir, f"best_trainloss_{args.name}")
+                        if not os.path.exists(save_path):
+                            os.makedirs(save_path)
+                        model.save_pretrained(save_path)
+                        tokenizer.save_pretrained(save_path)
+                        config.save_pretrained(save_path)
+                        main.best_train_loss = avg_train_loss
+                        print(f"Save model with best train loss: {avg_train_loss} at global_step {global_step}")
                 train_loss = 0.0
 
         train_bar.close()
