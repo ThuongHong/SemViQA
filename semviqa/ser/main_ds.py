@@ -136,7 +136,7 @@ def main(args):
                 print(f"Reached max_time={max_time}s, stopping training early.")
                 stop_by_time = True
                 train_bar.close()
-                return  
+                break 
             for key in batch:
                 batch[key] = batch[key].to(accelerator.device)
             batch['Tagging'] = batch['Tagging'].to(torch.float32)
@@ -191,6 +191,10 @@ def main(args):
                         main.best_train_loss = avg_train_loss
                         print(f"Save model with best train loss: {avg_train_loss} at global_step {global_step}")
                 train_loss = 0.0
+
+        if stop_by_time:
+            print(f"Stopping training early due to max_time={max_time}s.")
+            break
 
         train_bar.close()
         train_loss /= len(train_dataloader)
