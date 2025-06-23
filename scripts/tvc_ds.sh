@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 nvidia-smi
 source ~/.bashrc
 
@@ -15,7 +16,6 @@ EPOCHS=9        # Number of training epochs
 LR=2e-6          # Learning rate
 MODEL_NAME="microsoft/infoxlm-large"  # Base model (change if desired)
 OUTPUT_DIR="./output_deepspeed"
-DS_CONFIG="./semviqa/tvc/ds_zero2.json"
 
 # Launch training with 🤗 Accelerate + DeepSpeed (Stage-2)
 accelerate launch \
@@ -28,14 +28,13 @@ accelerate launch \
     --lr 3e-5 \
     --epochs $EPOCHS \
     --accumulation_steps 1 \
-    --batch_size $BS \
+    --train_batch_size $BS \
     --max_len 256 \
     --num_workers 2 \
     --patience 5 \
     --type_loss "ce" \
     --output_dir "./output" \
     --n_classes 3\
-    --is_pretrained 0\
-    --ds_config "$DS_CONFIG"
+    --is_pretrained 0
 
 echo "DeepSpeed TVC training completed!"
