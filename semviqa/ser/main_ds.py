@@ -20,7 +20,6 @@ from semviqa.ser.qatc_model import QATCConfig, QATCForQuestionAnswering
 from semviqa.ser.data_utils import load_data 
 
 os.environ["WANDB__SERVICE_WAIT"] = "300"
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 def count_parameters(model):
     total_params = sum(p.numel() for p in model.parameters())
