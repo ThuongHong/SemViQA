@@ -184,19 +184,19 @@ def main(args):
             "val_loss": mean_eval_loss,
             "f1-val": dev_f1
         }
-        if dev_f1 > best_acc and accelerator.is_main_process:
-            cnt = 0
-            tokenizer.save_pretrained(output_dir)
-            model.save_pretrained(output_dir)
-            config.save_pretrained(output_dir)
-            print(f'Saved best_model at epoch {epoch+1}')
-            best_acc = dev_f1
-        else:
-            cnt += 1
-        if cnt >= args.patience:
-            if accelerator.is_main_process:
+        if accelerator.is_main_process:
+            if dev_f1 > best_acc:
+                cnt = 0
+                tokenizer.save_pretrained(output_dir)
+                model.save_pretrained(output_dir)
+                config.save_pretrained(output_dir)
+                print(f'Saved best_model at epoch {epoch+1}')
+                best_acc = dev_f1
+            else:
+                cnt += 1
+            if cnt >= args.patience:
                 print('Early stopping')
-            break
+                break
         torch.cuda.empty_cache()
     if accelerator.is_main_process:
         print(f'Total training time: {time.time() - total_time:.2f}s')
