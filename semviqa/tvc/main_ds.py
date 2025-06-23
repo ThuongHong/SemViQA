@@ -54,9 +54,7 @@ def main(args):
             }
         }
     )
-
-
-    )
+ 
     accelerator = Accelerator(
         gradient_accumulation_steps=args.accumulation_steps,
         project_config=accelerator_project_config,
