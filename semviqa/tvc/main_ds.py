@@ -76,8 +76,8 @@ def main(args):
     count_parameters(model)
     train_dataset = Data(train_data, tokenizer, args, max_len=args.max_len)
     dev_dataset = Data(dev_data, tokenizer, args, max_len=args.max_len)
-    train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers)
-    dev_loader = DataLoader(dev_dataset, batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers)
+    train_loader = DataLoader(train_dataset, batch_size=args.train_batch_size, shuffle=True, num_workers=args.num_workers)
+    dev_loader = DataLoader(dev_dataset, batch_size=args.train_batch_size, shuffle=False, num_workers=args.num_workers)
     optimizer = AdamW(model.parameters(), lr=args.lr)
     lr_scheduler = get_linear_schedule_with_warmup(
         optimizer, 
@@ -187,7 +187,7 @@ def parse_args():
     parser.add_argument('--model_name', type=str, default='MoritzLaurer/ernie-m-large-mnli-xnli')
     parser.add_argument('--lr', type=float, default=1e-5)
     parser.add_argument('--epochs', type=int, default=10)
-    parser.add_argument('--batch_size', type=int, default=8)
+    parser.add_argument('--train_batch_size', type=int, default=8)
     parser.add_argument('--max_len', type=int, default=256)
     parser.add_argument('--num_workers', type=int, default=2)
     parser.add_argument('--patience', type=int, default=5)
