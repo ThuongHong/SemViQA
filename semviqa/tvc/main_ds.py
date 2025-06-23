@@ -154,15 +154,25 @@ def main(args):
                 outputs = model(input_ids=input_ids, attention_mask=attention_mask, labels=y_true)
                 loss = outputs["loss"]
                 logits = outputs["logits"]
-                eval_losses.append(loss.item())
+                eval_losses.append(loss.detach())
                 _, pred = torch.max(logits, dim=1)
-                y_true_list.extend(y_true.cpu().numpy())
-                y_pred_list.extend(pred.cpu().numpy())
-        dev_f1 = f1_score(y_true_list, y_pred_list, average='macro')
-        dev_acc = accuracy_score(y_true_list, y_pred_list)
+                y_true_list.append(y_true)
+                y_pred_list.append(pred)
+        # Gather results from all processes
+        all_y_true = accelerator.gather_for_metrics(torch.cat(y_true_list))
+        all_y_pred = accelerator.gather_for_metrics(torch.cat(y_pred_list))
+        all_eval_losses = accelerator.gather_for_metrics(torch.tensor(eval_losses, device=accelerator.device))
+        if accelerator.is_main_process:
+            dev_f1 = f1_score(all_y_true.cpu().numpy(), all_y_pred.cpu().numpy(), average='macro')
+            dev_acc = accuracy_score(all_y_true.cpu().numpy(), all_y_pred.cpu().numpy())
+            mean_eval_loss = all_eval_losses.float().mean().item()
+        else:
+            dev_f1 = None
+            dev_acc = None
+            mean_eval_loss = None
         epoch_eval_time = time.time() - start_eval_time
         if accelerator.is_main_process:
-            print(f'Dev time: {epoch_eval_time}s Dev Loss: {np.mean(eval_losses):.4f} F1: {dev_f1:.4f} Acc: {dev_acc:.4f}')
+            print(f'Dev time: {epoch_eval_time:.2f}s Dev Loss: {mean_eval_loss:.4f} F1: {dev_f1:.4f} Acc: {dev_acc:.4f}')
         info_epoch[epoch] = {
             "time_train": epoch_training_time,
             "epoch": epoch,
@@ -171,7 +181,7 @@ def main(args):
             "f1-train": train_f1,
             "time_val": epoch_eval_time,
             "val_acc": dev_acc,
-            "val_loss": np.mean(eval_losses),
+            "val_loss": mean_eval_loss,
             "f1-val": dev_f1
         }
         if dev_f1 > best_acc and accelerator.is_main_process:
