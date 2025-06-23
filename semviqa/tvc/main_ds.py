@@ -40,7 +40,7 @@ def main(args):
     ds_plugin = DeepSpeedPlugin(
         zero_stage=2,
         gradient_accumulation_steps=args.accumulation_steps,
-        hf_ds_config=None,
+        hf_ds_config=args.ds_config,
     )
     accelerator = Accelerator(
         gradient_accumulation_steps=args.accumulation_steps,
@@ -198,6 +198,7 @@ def parse_args():
     parser.add_argument('--dropout_prob', type=float, default=0.3)
     parser.add_argument('--accumulation_steps', type=int, default=1)
     parser.add_argument('--is_pretrained', type=int, default=0)
+    parser.add_argument("--ds_config", type=str, default="SemViQA/semviqa/tvc/ds_zero2.json", help="DeepSpeed config file")
     return parser.parse_args()
 
 if __name__ == '__main__':
