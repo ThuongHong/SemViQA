@@ -1,6 +1,14 @@
 
 import torch
 from torch.utils.data import Dataset
+import re
+
+def preprocess_text(text: str) -> str:    
+    text = re.sub(r"['\",\.\?:\!]", "", text)
+    text = text.strip()
+    text = " ".join(text.split())
+    return text.lower()
+
 class Data(Dataset):
     def __init__(self, df, tokenizer, config, max_len=256):
         self.df = df
@@ -15,8 +23,8 @@ class Data(Dataset):
         claim, context, label, ids = self.get_input_data(row)
         
         encoding = self.tokenizer.encode_plus(
-            claim,
-            context,
+            preprocess_text(claim),
+            preprocess_text(context),
             truncation=True,
             add_special_tokens=True,
             max_length=self.max_len,
@@ -43,7 +51,7 @@ class Data(Dataset):
 
     def get_input_data(self, row):
         claim = row['claim']
-        context = row['context']
+        context = row['evidence']
         ids = row['id']
         label = self.labelencoder(row['verdict'])
         
