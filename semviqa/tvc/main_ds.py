@@ -32,6 +32,12 @@ def count_parameters(model):
     print(f'The model has {sum(p.numel() for p in model.parameters()):,} parameters')
 
 def main(args):  
+    # Ensure train_batch_size is valid
+    if not hasattr(args, 'train_batch_size') or args.train_batch_size is None:
+        args.train_batch_size = 8  # default value
+    else:
+        args.train_batch_size = int(args.train_batch_size)
+        
     logging_dir = os.path.join(args.output_dir, "logs")
     accelerator_project_config = ProjectConfiguration(
         project_dir=args.output_dir, logging_dir=logging_dir
