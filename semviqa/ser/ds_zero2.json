@@ -1,4 +1,5 @@
 {
+  "train_micro_batch_size_per_gpu": 4,
   "train_batch_size": 12,
   "gradient_accumulation_steps": 1,
   "fp16": {
@@ -12,4 +13,4 @@
     "reduce_bucket_size": 200000000,
     "overlap_comm": true
   }
-} 
+}
