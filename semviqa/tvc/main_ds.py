@@ -34,6 +34,15 @@ def count_parameters(model):
 def main(args):
     if args.train_batch_size is None or args.accumulation_steps is None:
         raise ValueError(f"train_batch_size ({args.train_batch_size}) and accumulation_steps ({args.accumulation_steps}) must not be None.")
+    # Debug print to check values
+    print(f"DEBUG: train_batch_size={args.train_batch_size}, accumulation_steps={args.accumulation_steps}")
+    # Fallback to default if None
+    if args.train_batch_size is None:
+        print("WARNING: train_batch_size is None, setting to default 8")
+        args.train_batch_size = 8
+    if args.accumulation_steps is None:
+        print("WARNING: accumulation_steps is None, setting to default 1")
+        args.accumulation_steps = 1
     try:
         args.train_batch_size = int(args.train_batch_size)
         args.accumulation_steps = int(args.accumulation_steps)
