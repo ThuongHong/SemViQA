@@ -200,7 +200,7 @@ def parse_args():
     parser.add_argument('--model_name', type=str, default='MoritzLaurer/ernie-m-large-mnli-xnli')
     parser.add_argument('--lr', type=float, default=1e-5)
     parser.add_argument('--epochs', type=int, default=10)
-    parser.add_argument('--args.train_batch_size', type=int, default=8)
+    parser.add_argument('--train_batch_size', type=int, default=8)
     parser.add_argument('--max_len', type=int, default=256)
     parser.add_argument('--num_workers', type=int, default=2)
     parser.add_argument('--patience', type=int, default=5)
