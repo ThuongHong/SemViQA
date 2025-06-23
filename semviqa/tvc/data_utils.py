@@ -23,8 +23,8 @@ class Data(Dataset):
         claim, context, label, ids = self.get_input_data(row)
         
         encoding = self.tokenizer.encode_plus(
-            preprocess_text(claim),
-            preprocess_text(context),
+            claim,
+            context,
             truncation=True,
             add_special_tokens=True,
             max_length=self.max_len,
