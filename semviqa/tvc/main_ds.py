@@ -40,25 +40,21 @@ def main(args):
     ds_plugin = DeepSpeedPlugin(
         zero_stage=2,
         gradient_accumulation_steps=args.accumulation_steps,
-        ds_plugin = DeepSpeedPlugin(
-            zero_stage=2,
-            gradient_accumulation_steps=args.accumulation_steps,
-            hf_ds_config={
-                "train_batch_size": args.batch_size * args.accumulation_steps,
-                "gradient_accumulation_steps": args.accumulation_steps,
-                "fp16": {
-                    "enabled": False
-                },
-                "zero_optimization": {
-                    "stage": 2,
-                    "allgather_partitions": True,
-                    "allgather_bucket_size": 200000000,
-                    "reduce_scatter": True,
-                    "reduce_bucket_size": 200000000,
-                    "overlap_comm": True
-                }
+        hf_ds_config={
+            "train_batch_size": args.batch_size * args.accumulation_steps,
+            "gradient_accumulation_steps": args.accumulation_steps,
+            "fp16": {"enabled": False},
+            "zero_optimization": {
+                "stage": 2,
+                "allgather_partitions": True,
+                "allgather_bucket_size": 200000000,
+                "reduce_scatter": True,
+                "reduce_bucket_size": 200000000,
+                "overlap_comm": True
             }
-        )
+        }
+    )
+
 
     )
     accelerator = Accelerator(
