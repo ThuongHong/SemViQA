@@ -49,7 +49,7 @@ def main(args):
         project_dir=args.output_dir, logging_dir=logging_dir
     )
     ds_plugin = DeepSpeedPlugin(
-        zero_stage=2,
+        zero_stage=0,
         gradient_accumulation_steps=args.accumulation_steps,
         hf_ds_config=args.ds_config
     ) 
@@ -217,3 +217,8 @@ def parse_args():
 if __name__ == '__main__':
     args = parse_args()
     main(args)
+
+import os
+print("[DEBUG] WORLD_SIZE:", os.environ.get("WORLD_SIZE"))
+print("[DEBUG] LOCAL_RANK:", os.environ.get("LOCAL_RANK"))
+print("[DEBUG] RANK:", os.environ.get("RANK"))
