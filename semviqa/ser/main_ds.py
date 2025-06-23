@@ -124,19 +124,12 @@ def main(args):
     global_step = 1
     cnt = 0
     start_time = time.time()
-    max_time = getattr(args, 'max_time', None)
-    stop_by_time = False
 
     for epoch in range(args.num_train_epochs):
         model.train()
         train_bar = tqdm(total=len(train_dataloader), desc=f"Epoch {epoch+1}/{args.num_train_epochs} [Train]", disable=not accelerator.is_local_main_process)
         train_loss = 0.0
         for step, batch in enumerate(train_dataloader):
-            if max_time is not None and (time.time() - start_time) > max_time:
-                print(f"Reached max_time={max_time}s, stopping training early.")
-                stop_by_time = True
-                train_bar.close()
-                break 
             for key in batch:
                 batch[key] = batch[key].to(accelerator.device)
             batch['Tagging'] = batch['Tagging'].to(torch.float32)
@@ -191,11 +184,6 @@ def main(args):
                         main.best_train_loss = avg_train_loss
                         print(f"Save model with best train loss: {avg_train_loss} at global_step {global_step}")
                 train_loss = 0.0
-
-        if stop_by_time:
-            print(f"Stopping training early due to max_time={max_time}s.")
-            accelerator.wait_for_everyone()  
-            break
 
         train_bar.close()
         train_loss /= len(train_dataloader)
@@ -262,44 +250,6 @@ def main(args):
 
     print("Training completed in:", time.time() - start_time, "seconds.")
 
-    if stop_by_time and accelerator.is_main_process:
-        print("Loading best_trainloss model for evaluation...")
-        best_trainloss_path = os.path.join(args.output_dir, f"best_trainloss_{args.name}")
-        if os.path.exists(best_trainloss_path):
-            model = QATCForQuestionAnswering.from_pretrained(best_trainloss_path) 
-            model.to(accelerator.device)
-            model.eval()
-            eval_loss = 0.0
-            predictions, true_positions = [], []
-            for step, batch in enumerate(eval_dataloader):
-                with torch.no_grad():
-                    for key in batch:
-                        batch[key] = batch[key].to(accelerator.device)
-                    batch['Tagging'] = batch['Tagging'].to(torch.float32)
-                    output = model(
-                        input_ids=batch['input_ids'],
-                        attention_mask=batch['attention_mask'],
-                        start_positions=batch['start_positions'],
-                        end_positions=batch['end_positions'],
-                        tagging_labels=batch['Tagging']
-                    )
-                    loss = output.loss
-                    eval_loss += loss.item()
-                    start_preds = torch.argmax(output.start_logits, axis=1).cpu().detach().tolist()
-                    end_preds = torch.argmax(output.end_logits, axis=1).cpu().detach().tolist()
-                    start_true = batch['start_positions'].flatten().cpu().tolist()
-                    end_true = batch['end_positions'].flatten().cpu().tolist()
-                    predictions.extend(list(zip(start_preds, end_preds)))
-                    true_positions.extend(list(zip(start_true, end_true)))
-            gathered_predictions = accelerator.gather_for_metrics(torch.tensor(predictions, device=accelerator.device))
-            gathered_true_positions = accelerator.gather_for_metrics(torch.tensor(true_positions, device=accelerator.device))
-            all_predictions = [tuple(x.tolist()) for x in gathered_predictions]
-            all_true_positions = [tuple(x.tolist()) for x in gathered_true_positions]
-            eval_loss = eval_loss / len(eval_dataloader)
-            accuracy = np.mean([p == t for p, t in zip(all_predictions, all_true_positions)])
-            print(f"[Best Train Loss Model] Eval Loss: {eval_loss} - Accuracy: {accuracy}")
-        else:
-            print(f"No best_trainloss model found at {best_trainloss_path}")
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Evaluate VNFASHIONDIFF")
@@ -339,7 +289,6 @@ def parse_args():
     parser.add_argument("--patience", type=int, default=5, help="Patience for early stopping")
     parser.add_argument("--is_pretrained", type=int, default=0, help="Load pre-trained model")
     parser.add_argument("--ds_config", type=str, default="SemViQA/semviqa/ser/ds_zero2.json", help="DeepSpeed config file")
-    parser.add_argument("--max_time", type=float, default=None, help="Max training time in seconds. If set, training will stop after this many seconds.")
     args = parser.parse_args()
     return args
 if __name__ == "__main__":
