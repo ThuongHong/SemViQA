@@ -31,25 +31,7 @@ def count_parameters(model):
     print(f'The model has {sum(p.numel() for p in model.parameters() if p.requires_grad):,} trainable parameters')
     print(f'The model has {sum(p.numel() for p in model.parameters()):,} parameters')
 
-def main(args):
-    if args.train_batch_size is None or args.accumulation_steps is None:
-        raise ValueError(f"train_batch_size ({args.train_batch_size}) and accumulation_steps ({args.accumulation_steps}) must not be None.")
-    # Debug print to check values
-    print(f"DEBUG: train_batch_size={args.train_batch_size}, accumulation_steps={args.accumulation_steps}")
-    # Fallback to default if None
-    if args.train_batch_size is None:
-        print("WARNING: train_batch_size is None, setting to default 8")
-        args.train_batch_size = 8
-    if args.accumulation_steps is None:
-        print("WARNING: accumulation_steps is None, setting to default 1")
-        args.accumulation_steps = 1
-    try:
-        args.train_batch_size = int(args.train_batch_size)
-        args.accumulation_steps = int(args.accumulation_steps)
-    except Exception as e:
-        raise ValueError(f"train_batch_size and accumulation_steps must be integers. Got: {args.train_batch_size}, {args.accumulation_steps}")
-    
-    # Accelerate + DeepSpeed setup
+def main(args):  
     logging_dir = os.path.join(args.output_dir, "logs")
     accelerator_project_config = ProjectConfiguration(
         project_dir=args.output_dir, logging_dir=logging_dir
@@ -57,19 +39,7 @@ def main(args):
     ds_plugin = DeepSpeedPlugin(
         zero_stage=2,
         gradient_accumulation_steps=args.accumulation_steps,
-        hf_ds_config={
-            "train_batch_size": args.train_batch_size * args.accumulation_steps,
-            "gradient_accumulation_steps": args.accumulation_steps,
-            "fp16": {"enabled": False},
-            "zero_optimization": {
-                "stage": 2,
-                "allgather_partitions": True,
-                "allgather_bucket_size": 200000000,
-                "reduce_scatter": True,
-                "reduce_bucket_size": 200000000,
-                "overlap_comm": True
-            }
-        }
+        hf_ds_config=args.ds_config
     ) 
     accelerator = Accelerator(
         gradient_accumulation_steps=args.accumulation_steps,
@@ -227,6 +197,7 @@ def parse_args():
     parser.add_argument('--dropout_prob', type=float, default=0.3)
     parser.add_argument('--accumulation_steps', type=int, default=1)
     parser.add_argument('--is_pretrained', type=int, default=0)
+    parser.add_argument('--ds_config', type=str, default='ds_config.json')
     return parser.parse_args()
 
 if __name__ == '__main__':
