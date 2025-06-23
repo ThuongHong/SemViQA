@@ -34,10 +34,16 @@ def count_parameters(model):
 def main(args):  
     # Ensure train_batch_size is valid
     if not hasattr(args, 'train_batch_size') or args.train_batch_size is None:
+        print('Warning: args.train_batch_size is None, set to 8')
         args.train_batch_size = 8  # default value
     else:
-        args.train_batch_size = int(args.train_batch_size)
-        
+        try:
+            args.train_batch_size = int(args.train_batch_size)
+        except Exception as e:
+            raise ValueError(f"train_batch_size is not an integer: {args.train_batch_size}")
+    if args.train_batch_size is None or args.train_batch_size <= 0:
+        raise ValueError(f"train_batch_size must be a positive integer, got {args.train_batch_size}")
+    print(f"[DEBUG] train_batch_size: {args.train_batch_size}")
     logging_dir = os.path.join(args.output_dir, "logs")
     accelerator_project_config = ProjectConfiguration(
         project_dir=args.output_dir, logging_dir=logging_dir
@@ -83,6 +89,8 @@ def main(args):
     dev_dataset = Data(dev_data, tokenizer, args, max_len=args.max_len)
     train_loader = DataLoader(train_dataset, batch_size=args.train_batch_size, shuffle=True, num_workers=args.num_workers)
     dev_loader = DataLoader(dev_dataset, batch_size=args.train_batch_size, shuffle=False, num_workers=args.num_workers)
+    print(f"[DEBUG] train_loader batch_size: {train_loader.batch_size}")
+    print(f"[DEBUG] dev_loader batch_size: {dev_loader.batch_size}")
     optimizer = AdamW(model.parameters(), lr=args.lr)
     lr_scheduler = get_linear_schedule_with_warmup(
         optimizer, 
