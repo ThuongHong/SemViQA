@@ -20,7 +20,6 @@ from .qatc_model import QATCConfig, QATCForQuestionAnswering
 from .data_utils import load_data 
 
 os.environ["WANDB__SERVICE_WAIT"] = "300"
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 def count_parameters(model):
     total_params = sum(p.numel() for p in model.parameters())
@@ -122,8 +121,10 @@ def main(args):
     start_time = time.time()
 
     for epoch in range(args.num_train_epochs):
+        epoch_start_time = time.time()
         model.train()
         train_loss = 0.0
+        progress_bar.set_description(f"Epoch {epoch+1}/{args.num_train_epochs}")
         for step, batch in enumerate(train_dataloader):
             for key in batch:
                 batch[key] = batch[key].to(accelerator.device)
@@ -150,6 +151,8 @@ def main(args):
             avg_loss = accelerator.gather(loss.repeat(args.train_batch_size)).mean()
             train_loss += avg_loss.item() / args.gradient_accumulation_steps
             logs = {"step": f"{step}/{len(train_dataloader)}", "step_loss": loss.detach().item(), "lr": lr_scheduler.get_last_lr()[0]}
+            elapsed = time.time() - epoch_start_time
+            logs["epoch_time"] = f"{elapsed:.1f}s"
             progress_bar.set_postfix(logs)
             global_step += 1
             
@@ -163,8 +166,9 @@ def main(args):
                     }) 
                 train_loss = 0.0
 
+        epoch_time = time.time() - epoch_start_time
         train_loss /= len(train_dataloader)
-        print(f"Epoch {epoch+1} - Train Loss: {train_loss}")
+        print(f"Epoch {epoch+1} - Train Loss: {train_loss} - Time: {epoch_time:.2f}s")
 
         model.eval()
         eval_loss = 0.0
