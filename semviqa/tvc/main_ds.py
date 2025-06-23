@@ -32,6 +32,14 @@ def count_parameters(model):
     print(f'The model has {sum(p.numel() for p in model.parameters()):,} parameters')
 
 def main(args):
+    if args.train_batch_size is None or args.accumulation_steps is None:
+        raise ValueError(f"train_batch_size ({args.train_batch_size}) and accumulation_steps ({args.accumulation_steps}) must not be None.")
+    try:
+        args.train_batch_size = int(args.train_batch_size)
+        args.accumulation_steps = int(args.accumulation_steps)
+    except Exception as e:
+        raise ValueError(f"train_batch_size and accumulation_steps must be integers. Got: {args.train_batch_size}, {args.accumulation_steps}")
+    
     # Accelerate + DeepSpeed setup
     logging_dir = os.path.join(args.output_dir, "logs")
     accelerator_project_config = ProjectConfiguration(
@@ -53,8 +61,7 @@ def main(args):
                 "overlap_comm": True
             }
         }
-    )
-    print(args.train_batch_size)
+    ) 
     accelerator = Accelerator(
         gradient_accumulation_steps=args.accumulation_steps,
         project_config=accelerator_project_config,
