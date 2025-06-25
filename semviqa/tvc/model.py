@@ -64,7 +64,12 @@ class ClaimModelForClassification(PreTrainedModel):
         logits = self.fc(x)
         
         if labels is not None:
+            if self.config.loss_type in ['focal', 'asymmetric']:
+                if labels.dim() == 1:   
+                    labels = torch.nn.functional.one_hot(labels, num_classes=self.config.num_labels).float()
+                else:
+                    labels = labels.float()  
             loss = self.loss_fn(logits, labels)
-            return {"loss": loss, "logits": logits}  
+            return {"loss": loss, "logits": logits}
         
         return {"logits": logits}
