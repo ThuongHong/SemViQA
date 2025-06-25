@@ -1,7 +1,7 @@
 from transformers import PreTrainedModel, AutoModel, PretrainedConfig
 import torch
 import torch.nn as nn
-from .loss import FocalLoss
+from .loss import FocalLoss, AsymmetricLossOptimized
 
 class ClaimModelConfig(PretrainedConfig):
     model_type = "claim_verification"
@@ -33,6 +33,8 @@ class ClaimModelForClassification(PreTrainedModel):
 
         if self.config.loss_type == 'focal':
             self.loss_fn = FocalLoss()
+        elif self.config.loss_type == 'asymmetric':
+            self.loss_fn = AsymmetricLossOptimized()
         else:
             self.loss_fn = nn.CrossEntropyLoss()
 
