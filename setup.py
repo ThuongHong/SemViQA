@@ -23,7 +23,7 @@ setup(
         "sentencepiece==0.2.0",
         "pyvi==0.1.1",
     ],
-    author="Nam V. Nguyen, Dien X. Tran, Thanh T. Tran, Anh T. Hoang, Tai V. Duong, Di T. Le, Phuc-Lu Le",
+    author="Dien X. Tran, Nam V. Nguyen, Thanh T. Tran, Anh T. Hoang, Tai V. Duong, Di T. Le, Phuc-Lu Le",
     author_email="xuandienk4@gmail.com",
     description="SemViQA: A Semantic Question Answering System for Vietnamese Fact-Checking",
     long_description=open("README.md", encoding="utf-8").read(),
