@@ -340,9 +340,9 @@ Our development is based on our previous works:
 If you use **SemViQA** in your research, please cite our work:  
 
 ```bibtex
-@misc{nguyen2025semviqasemanticquestionanswering,
+@misc{tran2025semviqasemanticquestionanswering,
       title={SemViQA: A Semantic Question Answering System for Vietnamese Information Fact-Checking}, 
-      author={Nam V. Nguyen and Dien X. Tran and Thanh T. Tran and Anh T. Hoang and Tai V. Duong and Di T. Le and Phuc-Lu Le},
+      author={Dien X. Tran and Nam V. Nguyen and Thanh T. Tran and Anh T. Hoang and Tai V. Duong and Di T. Le and Phuc-Lu Le},
       year={2025},
       eprint={2503.00955},
       archivePrefix={arXiv},
