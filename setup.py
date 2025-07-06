@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="semviqa",
-    version="1.1.9",
+    version="1.1.10",
     packages=find_packages(),
     install_requires=[
         "transformers==4.42.3",
@@ -22,6 +22,7 @@ setup(
         "rank_bm25==0.2.2",
         "sentencepiece==0.2.0",
         "pyvi==0.1.1",
+        "deepspeed==0.17.1",
     ],
     author="Dien X. Tran, Nam V. Nguyen, Thanh T. Tran, Anh T. Hoang, Tai V. Duong, Di T. Le, Phuc-Lu Le",
     author_email="xuandienk4@gmail.com",

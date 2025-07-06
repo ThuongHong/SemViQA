@@ -1,9 +1,15 @@
 from transformers import PreTrainedModel, AutoModel, PretrainedConfig, RobertaModel, XLMRobertaModel
 from transformers.modeling_outputs import QuestionAnsweringModelOutput
+from dataclasses import dataclass
+from typing import Optional, Tuple
 import torch
 import torch.nn.functional as F
 import torch.nn as nn
 from .loss import comboLoss  
+
+@dataclass
+class QATCModelOutput(QuestionAnsweringModelOutput):
+    rational_tag_logits: Optional[torch.FloatTensor] = None
 
 class QATCConfig(PretrainedConfig):
     model_type = "qatc"
@@ -128,10 +134,11 @@ class QATCForQuestionAnswering(PreTrainedModel):
         if not return_dict:
             return (total_loss, start_logits, end_logits, rational_tag_logits) + outputs[2:]
 
-        return QuestionAnsweringModelOutput(
+        return QATCModelOutput(
             loss=total_loss,
             start_logits=start_logits,
             end_logits=end_logits,
             hidden_states=outputs.hidden_states,
-            attentions=outputs.attentions
+            attentions=outputs.attentions,
+            rational_tag_logits=rational_tag_logits
         )
