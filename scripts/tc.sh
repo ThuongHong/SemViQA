@@ -13,7 +13,7 @@ echo "Conda Environment: $CONDA_DEFAULT_ENV"
 export PYTHONPATH="SemViQA:$PYTHONPATH"
 echo "Running training script..."
 
-BS=32 
+BS=8 
 # If you want to fine-tune a pre-trained model, run the following script.
 # type_loss = "ce" or "focal"
 # tc
@@ -24,7 +24,7 @@ python3 -m semviqa.tvc.main \
     --model_name "SemViQA/tc-infoxlm-viwikifc" \
     --lr 3e-5 \
     --epochs 20 \
-    --accumulation_steps 4 \
+    --accumulation_steps 1 \
     --batch_size $BS \
     --max_len 512 \
     --num_workers 2 \
