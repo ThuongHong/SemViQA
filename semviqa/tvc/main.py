@@ -13,6 +13,7 @@ from tqdm import tqdm
 import os
 import time
 import multiprocessing
+from torch.cuda.amp import GradScaler, autocast
 
 from .data_utils import Data
 from .model import ClaimModelConfig, ClaimModelForClassification
@@ -86,6 +87,8 @@ def main(args):
     cnt = 0
     i = 0
 
+    scaler = GradScaler()
+
     total_time = time.time()
     for epoch in range(args.epochs):
         set_seed(42)
@@ -104,15 +107,16 @@ def main(args):
             input_ids = data['input_ids'].to(device)
             attention_mask = data['attention_masks'].to(device)
 
-            outputs = model(input_ids=input_ids, attention_mask=attention_mask, labels=y_true)
-            loss = outputs["loss"]
-            logits = outputs["logits"] 
-            train_losses.append(loss.item())
+            with autocast():
+                outputs = model(input_ids=input_ids, attention_mask=attention_mask, labels=y_true)
+                loss = outputs["loss"]
 
-            loss.backward()
+            scaler.scale(loss).backward()
+
             if (i + 1) % args.accumulation_steps == 0:
-                optimizer.step()
-                lr_scheduler.step() 
+                scaler.step(optimizer)
+                scaler.update()
+                lr_scheduler.step()
                 optimizer.zero_grad()
                 nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
             i += 1
